@@ -5,56 +5,52 @@ import { AudioNarrationButton } from '../../components/common/AudioNarrationButt
 import { AccessibleButton } from '../../components/common/AccessibleButton';
 import { useGameSession } from '../../services/useGameSession';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export const GameSessionScreen: React.FC = () => {
   const {
     session,
     stage,
-    selectedOption,
     isCorrect,
     startRecall,
     showRecognitionFallback,
     submitAnswer,
     resetSession,
     getNextDifficultyStub,
+    difficultyLabel,
+    domainLabel,
   } = useGameSession();
+  const { t } = useLanguage();
 
-  const nextLevel = getNextDifficultyStub(85, 3, session.difficultyLevel);
-
-  const diffColor: Record<string, string> = {
-    Gentle: COLORS.primaryGreen,
-    Moderate: COLORS.warmOrange,
-    Challenging: COLORS.error,
-  };
+  const nextCalculatedLevel = getNextDifficultyStub(85, 3, session.difficultyLevel);
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      {/* Header bar */}
-      <View style={styles.headerBar}>
-        <View style={styles.domainPill}>
-          <Ionicons name="bulb-outline" size={16} color={COLORS.lavender} />
-          <Text style={styles.domainPillText}>{session.domain}</Text>
+      <View style={styles.headerRow}>
+        <View style={styles.domainChip}>
+          <Ionicons name="bulb-outline" size={18} color={COLORS.primary} />
+          <Text style={styles.domainText}>{t('domainActivity', { domain: domainLabel })}</Text>
         </View>
-        <AudioNarrationButton textToNarrate={session.audioNarrationText} label="Instructions" />
+        <AudioNarrationButton textToNarrate={session.audioNarrationText} />
       </View>
 
       <Text style={styles.title}>{session.title}</Text>
 
-      {/* Difficulty badge */}
-      <View style={styles.diffRow}>
-        <View style={[styles.diffBadge, { backgroundColor: diffColor[session.difficultyLevel] + '18' }]}>
-          <View style={[styles.diffDot, { backgroundColor: diffColor[session.difficultyLevel] }]} />
-          <Text style={[styles.diffText, { color: diffColor[session.difficultyLevel] }]}>
-            {session.difficultyLevel}
+      <View style={styles.stubBadgeContainer}>
+        <Text style={styles.stubBadgeText}>
+          {t('difficulty')}: <Text style={{ fontWeight: '800' }}>{difficultyLabel(session.difficultyLevel)}</Text>
+          {' • '}
+          {t('adaptiveNext')}:{' '}
+          <Text style={{ fontWeight: '800', color: COLORS.primary }}>
+            {difficultyLabel(nextCalculatedLevel)}
           </Text>
-        </View>
-        <Text style={styles.adaptiveHint}>Adaptive next: <Text style={{ fontWeight: '800', color: COLORS.primaryGreen }}>{nextLevel}</Text></Text>
+        </Text>
       </View>
 
-      {/* STAGE 1: Study */}
       {stage === 'study' && (
-        <View style={styles.stageCard}>
-          <Text style={styles.instruction}>{session.instruction}</Text>
+        <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.stageCard}>
+          <Text style={styles.instructionText}>{session.instruction}</Text>
+
           <View style={styles.objectsGrid}>
             {session.objectsToRemember.map((obj) => (
               <View key={obj.id} style={styles.objectBox}>
@@ -65,7 +61,7 @@ export const GameSessionScreen: React.FC = () => {
             ))}
           </View>
           <AccessibleButton
-            title="I've Memorised These"
+            title={t('memorized')}
             onPress={startRecall}
             variant="primary"
             iconName="checkmark-circle"
@@ -74,21 +70,20 @@ export const GameSessionScreen: React.FC = () => {
         </View>
       )}
 
-      {/* STAGE 2: Recall */}
       {stage === 'recall' && (
-        <View style={[styles.stageCard, styles.stageOrange]}>
-          <Ionicons name="help-circle" size={40} color={COLORS.warmOrange} style={{ alignSelf: 'center', marginBottom: SPACING.xs }} />
+        <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.stageCard}>
           <Text style={styles.questionText}>"{session.recallQuestion}"</Text>
-          <Text style={styles.hintText}>Take your time. Picture it in your mind.</Text>
+          <Text style={styles.hintText}>{t('tryPicture')}</Text>
+
           <AccessibleButton
-            title="I Remember — Show Options"
+            title={t('iRemember')}
             onPress={showRecognitionFallback}
             variant="accent"
             iconName="bulb-outline"
             size="large"
           />
           <AccessibleButton
-            title="I Need a Hint"
+            title={t('giveHint')}
             onPress={showRecognitionFallback}
             variant="ghost"
             iconName="help-buoy-outline"
@@ -96,10 +91,10 @@ export const GameSessionScreen: React.FC = () => {
         </View>
       )}
 
-      {/* STAGE 3: Recognition */}
       {stage === 'recognition' && (
-        <View style={styles.stageCard}>
-          <Text style={styles.questionText}>Which object do you remember?</Text>
+        <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.stageCard}>
+          <Text style={styles.questionText}>{t('selectObject')}</Text>
+
           <View style={styles.optionsList}>
             {session.multipleChoiceOptions.map((opt, idx) => (
               <TouchableOpacity
@@ -109,29 +104,34 @@ export const GameSessionScreen: React.FC = () => {
                 style={styles.optionButton}
               >
                 <Text style={styles.optionText}>{opt}</Text>
-                <Ionicons name="chevron-forward" size={20} color={COLORS.textMuted} />
+                <Ionicons name="chevron-forward-circle" size={28} color={COLORS.info} />
               </TouchableOpacity>
             ))}
           </View>
         </View>
       )}
 
-      {/* STAGE 4: Result */}
       {stage === 'completed' && (
-        <View style={[styles.stageCard, isCorrect ? styles.stageSuccess : styles.stageSoft]}>
-          <View style={styles.feedbackCenter}>
-            <Text style={styles.feedbackEmoji}>{isCorrect ? '🎉' : '💚'}</Text>
-            <Text style={styles.feedbackTitle}>
-              {isCorrect ? 'Wonderful!' : 'Great Effort!'}
-            </Text>
-            <Text style={styles.feedbackDetail}>
-              {isCorrect
-                ? 'You remembered correctly. Excellent focus!'
-                : 'Daily practice is what keeps memories warm. Well done.'}
-            </Text>
+        <Card
+          bgColor={isCorrect ? COLORS.successBg : COLORS.accentSoft}
+          borderColor={COLORS.border}
+          style={styles.stageCard}
+        >
+          <View style={styles.feedbackHeader}>
+            <Ionicons
+              name={isCorrect ? 'happy' : 'heart'}
+              size={48}
+              color={isCorrect ? COLORS.primary : COLORS.accent}
+            />
+            <Text style={styles.feedbackTitle}>{isCorrect ? t('wonderful') : t('greatEffort')}</Text>
           </View>
+
+          <Text style={styles.feedbackDetail}>
+            {isCorrect ? t('correctFeedback') : t('effortFeedback')}
+          </Text>
+
           <AccessibleButton
-            title="Try Again"
+            title={t('tryAgain')}
             onPress={resetSession}
             variant={isCorrect ? 'primary' : 'outline'}
             iconName="refresh-circle"
@@ -146,7 +146,7 @@ export const GameSessionScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.md,
-    backgroundColor: COLORS.bgLight,
+    backgroundColor: COLORS.bg,
     flexGrow: 1,
     gap: SPACING.sm,
   },
@@ -154,14 +154,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: SPACING.xs,
+    gap: SPACING.sm,
+    flexWrap: 'wrap',
   },
   domainPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: COLORS.lavenderLight,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    backgroundColor: COLORS.primarySoft,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 8,
     borderRadius: ACCESSIBILITY.borderRadius.pill,
     borderWidth: 1,
     borderColor: COLORS.lavender + '44',
@@ -169,40 +171,26 @@ const styles = StyleSheet.create({
   domainPillText: {
     fontSize: ACCESSIBILITY.fontSize.caption - 1,
     fontWeight: '700',
-    color: COLORS.lavender,
+    color: COLORS.text,
   },
   title: {
     fontSize: ACCESSIBILITY.fontSize.heading,
     fontWeight: '800',
-    color: COLORS.textDark,
-    letterSpacing: -0.3,
+    color: COLORS.text,
+    marginVertical: SPACING.xs,
   },
-  diffRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.sm,
+  stubBadgeContainer: {
+    backgroundColor: COLORS.surfaceMuted,
+    padding: SPACING.sm,
+    borderRadius: ACCESSIBILITY.borderRadius.sm,
+    marginBottom: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  diffBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: ACCESSIBILITY.borderRadius.pill,
-  },
-  diffDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-  },
-  diffText: {
-    fontSize: ACCESSIBILITY.fontSize.micro,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-  },
-  adaptiveHint: {
-    fontSize: ACCESSIBILITY.fontSize.micro,
-    color: COLORS.textSubtle,
+  stubBadgeText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    lineHeight: 20,
   },
   stageCard: {
     backgroundColor: COLORS.surfaceElevated,
@@ -213,23 +201,12 @@ const styles = StyleSheet.create({
     ...SHADOWS.md,
     gap: SPACING.sm,
   },
-  stageOrange: {
-    backgroundColor: COLORS.warningLight,
-    borderColor: COLORS.peachDark,
-  },
-  stageSuccess: {
-    backgroundColor: COLORS.successLight,
-    borderColor: COLORS.mintGreenDark,
-  },
-  stageSoft: {
-    backgroundColor: COLORS.lightLilac,
-    borderColor: COLORS.lavender + '44',
-  },
-  instruction: {
-    fontSize: ACCESSIBILITY.fontSize.body - 2,
-    color: COLORS.textDark,
-    lineHeight: ACCESSIBILITY.lineHeight.body - 2,
+  instructionText: {
+    fontSize: ACCESSIBILITY.fontSize.body,
     fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: SPACING.md,
+    lineHeight: ACCESSIBILITY.lineHeight.body,
   },
   objectsGrid: {
     flexDirection: 'row',
@@ -237,9 +214,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   objectBox: {
-    flex: 1,
-    backgroundColor: COLORS.surface,
-    borderRadius: ACCESSIBILITY.borderRadius.sm,
+    width: '30%',
+    backgroundColor: COLORS.bg,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
     padding: SPACING.sm,
     alignItems: 'center',
     borderWidth: 1,
@@ -253,35 +230,36 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     textAlign: 'center',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
-  objectHin: {
-    fontSize: 10,
-    color: COLORS.textMuted,
+  objectHinName: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: 2,
   },
   questionText: {
     fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '700',
-    color: COLORS.textDark,
-    lineHeight: ACCESSIBILITY.lineHeight.heading - 2,
-    textAlign: 'center',
+    color: COLORS.text,
+    marginBottom: SPACING.sm,
+    lineHeight: ACCESSIBILITY.lineHeight.heading,
   },
   hintText: {
-    fontSize: ACCESSIBILITY.fontSize.caption - 1,
-    color: COLORS.textMuted,
-    textAlign: 'center',
+    fontSize: ACCESSIBILITY.fontSize.body - 1,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.lg,
+    lineHeight: ACCESSIBILITY.lineHeight.body,
   },
   optionsList: {
     gap: SPACING.xs,
   },
   optionButton: {
     minHeight: ACCESSIBILITY.minTouchTargetHeight,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surfaceMuted,
     borderRadius: ACCESSIBILITY.borderRadius.md,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
+    borderWidth: 2,
+    borderColor: COLORS.info,
     paddingHorizontal: SPACING.md,
     flexDirection: 'row',
     alignItems: 'center',
@@ -290,7 +268,8 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: ACCESSIBILITY.fontSize.body - 2,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: COLORS.text,
+    flex: 1,
   },
   feedbackCenter: {
     alignItems: 'center',
@@ -302,12 +281,12 @@ const styles = StyleSheet.create({
   feedbackTitle: {
     fontSize: ACCESSIBILITY.fontSize.heading,
     fontWeight: '800',
-    color: COLORS.textDark,
-    letterSpacing: -0.3,
+    color: COLORS.text,
+    marginTop: SPACING.xs,
   },
   feedbackDetail: {
-    fontSize: ACCESSIBILITY.fontSize.caption,
-    color: COLORS.textMuted,
+    fontSize: ACCESSIBILITY.fontSize.body,
+    color: COLORS.text,
     textAlign: 'center',
     lineHeight: ACCESSIBILITY.lineHeight.caption,
   },

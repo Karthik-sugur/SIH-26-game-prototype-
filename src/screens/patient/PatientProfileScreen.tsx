@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { COLORS, ACCESSIBILITY, SPACING, SHADOWS } from '../../theme/tokens';
+import { COLORS, ACCESSIBILITY, SPACING } from '../../theme/tokens';
+import { Card } from '../../components/common/Card';
 import { usePatientData } from '../../services/usePatientData';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 const InfoRow = ({ icon, label, value, iconColor, iconBg }: {
   icon: keyof typeof Ionicons.glyphMap;
@@ -55,53 +57,54 @@ const infoStyles = StyleSheet.create({
 
 export const PatientProfileScreen: React.FC = () => {
   const { patient } = usePatientData();
+  const { t } = useLanguage();
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      {/* Hero avatar */}
-      <View style={styles.hero}>
-        <View style={styles.avatarRing}>
-          <View style={styles.avatar}>
-            <Ionicons name="person" size={52} color={COLORS.primaryGreen} />
+      <Text style={styles.heading}>{t('profileHeading')}</Text>
+
+      <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.profileCard}>
+        <View style={styles.avatarBox}>
+          <Ionicons name="person-circle-outline" size={100} color={COLORS.primary} />
+        </View>
+        <Text style={styles.patientName}>{patient.name}</Text>
+        <Text style={styles.patientAge}>
+          {t('yearsOld', { age: patient.age, location: patient.location })}
+        </Text>
+      </Card>
+
+      <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.infoCard}>
+        <View style={styles.rowItem}>
+          <Ionicons name="language-outline" size={28} color={COLORS.info} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.label}>{t('preferredLanguages')}</Text>
+            <Text style={styles.value}>{patient.preferredLanguage}</Text>
           </View>
         </View>
-        <Text style={styles.name}>{patient.name}</Text>
-        <Text style={styles.meta}>{patient.age} years · {patient.location}</Text>
-        <View style={styles.streakPill}>
-          <Ionicons name="flame" size={14} color={COLORS.warmOrange} />
-          <Text style={styles.streakPillText}>{patient.streakDays}-day streak</Text>
+      </Card>
+
+      <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.infoCard}>
+        <View style={styles.rowItem}>
+          <Ionicons name="heart-outline" size={28} color={COLORS.accent} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.label}>{t('primaryCaregiver')}</Text>
+            <Text style={styles.value}>{patient.primaryCaregiverName}</Text>
+          </View>
         </View>
       </View>
 
-      {/* Info card */}
-      <View style={styles.card}>
-        <InfoRow
-          icon="language-outline"
-          label="Preferred Languages"
-          value={patient.preferredLanguage}
-          iconColor={COLORS.skyBlue}
-          iconBg={COLORS.skyBlueLight}
-        />
-        <InfoRow
-          icon="heart"
-          label="Primary Caregiver"
-          value={patient.primaryCaregiverName}
-          iconColor={COLORS.warmOrange}
-          iconBg={COLORS.peach}
-        />
-        <View style={{ height: 1 }} />
-      </View>
-
-      {/* Emergency contact */}
-      <View style={[styles.card, styles.emergencyCard]}>
-        <View style={styles.emergencyHeader}>
-          <Ionicons name="alert-circle" size={20} color={COLORS.error} />
-          <Text style={styles.emergencyTitle}>Emergency Contact</Text>
-        </View>
-        <Text style={styles.emergencyName}>{patient.emergencyContact.name}</Text>
-        <View style={styles.phonePill}>
-          <Ionicons name="call" size={14} color={COLORS.error} />
-          <Text style={styles.phoneText}>{patient.emergencyContact.phone}</Text>
+      <Card bgColor={COLORS.accentSoft} borderColor={COLORS.border} style={styles.infoCard}>
+        <View style={styles.rowItem}>
+          <Ionicons name="call" size={28} color={COLORS.error} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.label}>{t('emergencyContact')}</Text>
+            <Text style={[styles.value, { fontWeight: '800', fontSize: ACCESSIBILITY.fontSize.heading - 2 }]}>
+              {patient.emergencyContact.name}
+            </Text>
+            <Text style={[styles.value, { color: COLORS.error, fontWeight: '700' }]}>
+              {patient.emergencyContact.phone}
+            </Text>
+          </View>
         </View>
       </View>
     </ScrollView>
@@ -111,13 +114,15 @@ export const PatientProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.md,
-    backgroundColor: COLORS.bgLight,
+    backgroundColor: COLORS.bg,
     flexGrow: 1,
     gap: SPACING.md,
   },
-  hero: {
-    alignItems: 'center',
-    paddingVertical: SPACING.lg,
+  heading: {
+    fontSize: ACCESSIBILITY.fontSize.title,
+    fontWeight: '800',
+    color: COLORS.text,
+    marginBottom: SPACING.md,
   },
   avatarRing: {
     width: 108,
@@ -141,12 +146,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: ACCESSIBILITY.fontSize.title,
     fontWeight: '800',
-    color: COLORS.textDark,
-    letterSpacing: -0.5,
+    color: COLORS.text,
   },
-  meta: {
-    fontSize: ACCESSIBILITY.fontSize.caption,
-    color: COLORS.textMuted,
+  patientAge: {
+    fontSize: ACCESSIBILITY.fontSize.body,
+    color: COLORS.textSecondary,
     marginTop: 4,
   },
   streakPill: {
@@ -185,31 +189,13 @@ const styles = StyleSheet.create({
   },
   emergencyTitle: {
     fontSize: ACCESSIBILITY.fontSize.caption,
-    fontWeight: '800',
-    color: COLORS.error,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontWeight: '700',
+    color: COLORS.textSecondary,
   },
   emergencyName: {
     fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '700',
-    color: COLORS.textDark,
-  },
-  phonePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    alignSelf: 'flex-start',
-    backgroundColor: COLORS.white,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: ACCESSIBILITY.borderRadius.pill,
-    borderWidth: 1,
-    borderColor: COLORS.error + '40',
-  },
-  phoneText: {
-    fontSize: ACCESSIBILITY.fontSize.caption,
-    fontWeight: '700',
-    color: COLORS.error,
+    color: COLORS.text,
+    marginTop: 2,
   },
 });

@@ -26,8 +26,7 @@ export const Card: React.FC<CardProps> = ({
         elevated ? styles.elevated : styles.flat,
         {
           backgroundColor: bgColor,
-          borderColor: noBorder ? 'transparent' : borderColor,
-          borderWidth: noBorder ? 0 : 1,
+          borderColor,
         },
         style,
       ]}
@@ -42,12 +41,10 @@ const styles = StyleSheet.create({
     borderRadius: ACCESSIBILITY.borderRadius.md,
     padding: SPACING.md,
     marginVertical: SPACING.xs,
-    overflow: 'hidden',
-  },
-  flat: {
-    ...SHADOWS.sm,
-  },
-  elevated: {
-    ...SHADOWS.md,
+    shadowColor: '#1A2420',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
 });

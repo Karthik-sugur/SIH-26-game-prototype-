@@ -4,96 +4,61 @@ import { COLORS, ACCESSIBILITY, SPACING, SHADOWS } from '../../theme/tokens';
 import { AudioNarrationButton } from '../../components/common/AudioNarrationButton';
 import { useReminders } from '../../services/useReminders';
 import { Ionicons } from '@expo/vector-icons';
-import { CuedReminder } from '../../types';
-
-const CATEGORY_META: Record<string, { icon: keyof typeof Ionicons.glyphMap; color: string; bg: string }> = {
-  medicine:    { icon: 'medical',         color: COLORS.error,       bg: COLORS.errorLight },
-  hydration:   { icon: 'water',           color: COLORS.skyBlue,     bg: COLORS.skyBlueLight },
-  appointment: { icon: 'calendar',        color: COLORS.lavender,    bg: COLORS.lavenderLight },
-  activity:    { icon: 'walk',            color: COLORS.primaryGreen,bg: COLORS.mintGreen },
-};
-
-function ReminderRow({
-  item,
-  onToggle,
-}: {
-  item: CuedReminder;
-  onToggle: () => void;
-}) {
-  const meta = CATEGORY_META[item.category] ?? CATEGORY_META.activity;
-
-  return (
-    <View style={[styles.row, item.completedToday && styles.rowDone]}>
-      {/* Category icon */}
-      <View style={[styles.catIcon, { backgroundColor: meta.bg }]}>
-        <Ionicons name={meta.icon} size={20} color={meta.color} />
-      </View>
-
-      {/* Content */}
-      <View style={{ flex: 1 }}>
-        <View style={styles.rowHeaderLine}>
-          <Text style={styles.timeText}>{item.time}</Text>
-          <AudioNarrationButton textToNarrate={item.audioNarrationText} label="Listen" />
-        </View>
-        <Text style={[styles.questionText, item.completedToday && styles.questionDone]}>
-          "{item.questionPrompt}"
-        </Text>
-        <Text style={styles.subtitleText}>{item.subtitle}</Text>
-      </View>
-
-      {/* Check button */}
-      <TouchableOpacity
-        onPress={onToggle}
-        style={[styles.checkCircle, item.completedToday && styles.checkCircleDone]}
-        activeOpacity={0.7}
-      >
-        <Ionicons
-          name={item.completedToday ? 'checkmark' : 'ellipse-outline'}
-          size={22}
-          color={item.completedToday ? COLORS.white : COLORS.border}
-        />
-      </TouchableOpacity>
-    </View>
-  );
-}
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export const PatientRemindersScreen: React.FC = () => {
   const { reminders, toggleReminderComplete } = useReminders();
-  const done = reminders.filter((r) => r.completedToday).length;
+  const { t } = useLanguage();
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.heading}>Today's Gentle Cues</Text>
-        <View style={styles.progressPill}>
-          <Ionicons name="checkmark-circle" size={16} color={COLORS.primaryGreen} />
-          <Text style={styles.progressText}>{done} of {reminders.length} done</Text>
-        </View>
-      </View>
+      <Text style={styles.heading}>{t('cuesHeading')}</Text>
+      <Text style={styles.subheading}>{t('cuesSubheading')}</Text>
 
-      {/* Progress bar */}
-      <View style={styles.progressBarTrack}>
-        <View
-          style={[
-            styles.progressBarFill,
-            { width: reminders.length ? `${(done / reminders.length) * 100}%` : '0%' },
-          ]}
-        />
-      </View>
+      {reminders.map((item) => (
+        <Card
+          key={item.id}
+          bgColor={item.completedToday ? COLORS.successBg : COLORS.surface}
+          borderColor={item.completedToday ? COLORS.primary : COLORS.border}
+          style={styles.reminderCard}
+        >
+          <View style={styles.timeCategoryRow}>
+            <View style={styles.timeBadge}>
+              <Ionicons name="time-outline" size={18} color={COLORS.text} />
+              <Text style={styles.timeText}>{item.time}</Text>
+            </View>
+            <AudioNarrationButton textToNarrate={item.audioNarrationText} />
+          </View>
 
       <Text style={styles.subheading}>Warm reminders, not alarms.</Text>
 
-      {/* Reminder rows */}
-      <View style={styles.list}>
-        {reminders.map((item) => (
-          <ReminderRow
-            key={item.id}
-            item={item}
-            onToggle={() => toggleReminderComplete(item.id)}
-          />
-        ))}
-      </View>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => toggleReminderComplete(item.id)}
+            style={[
+              styles.checkButton,
+              {
+                backgroundColor: item.completedToday ? COLORS.primary : COLORS.surfaceMuted,
+                borderColor: item.completedToday ? COLORS.primary : COLORS.info,
+              },
+            ]}
+          >
+            <Ionicons
+              name={item.completedToday ? 'checkmark-circle' : 'ellipse-outline'}
+              size={28}
+              color={item.completedToday ? COLORS.white : COLORS.info}
+            />
+            <Text
+              style={[
+                styles.checkButtonText,
+                { color: item.completedToday ? COLORS.white : COLORS.text },
+              ]}
+            >
+              {item.completedToday ? t('doneToday') : t('tapConfirm')}
+            </Text>
+          </TouchableOpacity>
+        </Card>
+      ))}
     </ScrollView>
   );
 };
@@ -101,7 +66,7 @@ export const PatientRemindersScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.md,
-    backgroundColor: COLORS.bgLight,
+    backgroundColor: COLORS.bg,
     flexGrow: 1,
   },
   header: {
@@ -113,39 +78,13 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: ACCESSIBILITY.fontSize.heading,
     fontWeight: '800',
-    color: COLORS.textDark,
-    letterSpacing: -0.3,
-  },
-  progressPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: COLORS.mintGreen,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: ACCESSIBILITY.borderRadius.pill,
-  },
-  progressText: {
-    fontSize: ACCESSIBILITY.fontSize.micro,
-    fontWeight: '700',
-    color: COLORS.primaryGreen,
-  },
-  progressBarTrack: {
-    height: 5,
-    backgroundColor: COLORS.border,
-    borderRadius: 3,
-    marginBottom: SPACING.xs,
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: COLORS.primaryGreen,
-    borderRadius: 3,
+    color: COLORS.text,
   },
   subheading: {
-    fontSize: ACCESSIBILITY.fontSize.caption - 1,
-    color: COLORS.textMuted,
+    fontSize: ACCESSIBILITY.fontSize.body - 1,
+    color: COLORS.textSecondary,
     marginBottom: SPACING.md,
+    lineHeight: ACCESSIBILITY.lineHeight.body,
   },
   list: {
     gap: SPACING.sm,
@@ -170,44 +109,40 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 14,
     alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-    marginTop: 2,
+    marginBottom: SPACING.sm,
+    gap: SPACING.sm,
+    flexWrap: 'wrap',
   },
   rowHeaderLine: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    backgroundColor: COLORS.surfaceMuted,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 8,
+    borderRadius: ACCESSIBILITY.borderRadius.sm,
+    gap: 6,
   },
   timeText: {
     fontSize: ACCESSIBILITY.fontSize.micro,
     fontWeight: '700',
-    color: COLORS.textSubtle,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    color: COLORS.text,
   },
   questionText: {
     fontSize: ACCESSIBILITY.fontSize.body - 2,
     fontWeight: '700',
-    color: COLORS.textDark,
-    lineHeight: ACCESSIBILITY.lineHeight.caption,
-    marginBottom: 4,
-  },
-  questionDone: {
-    color: COLORS.textMuted,
-    textDecorationLine: 'line-through',
+    color: COLORS.text,
+    marginVertical: SPACING.xs,
+    lineHeight: ACCESSIBILITY.lineHeight.heading - 2,
   },
   subtitleText: {
-    fontSize: ACCESSIBILITY.fontSize.micro,
-    color: COLORS.textMuted,
-    lineHeight: 17,
+    fontSize: ACCESSIBILITY.fontSize.body - 1,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.md,
   },
-  checkCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: COLORS.surface,
+  checkButton: {
+    minHeight: ACCESSIBILITY.minTouchTargetHeight,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
     borderWidth: 2,
     borderColor: COLORS.border,
     alignItems: 'center',

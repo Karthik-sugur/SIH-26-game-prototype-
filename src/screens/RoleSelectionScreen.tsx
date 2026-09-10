@@ -2,8 +2,10 @@ import React, { useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { COLORS, ACCESSIBILITY, SPACING, SHADOWS } from '../theme/tokens';
 import { AccessibleButton } from '../components/common/AccessibleButton';
+import { LanguageToggle } from '../components/common/LanguageToggle';
 import { UserRole } from '../types';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface RoleSelectionScreenProps {
   onSelectRole: (role: UserRole) => void;
@@ -58,48 +60,63 @@ const RoleCard: React.FC<RoleCardProps> = ({
 };
 
 export const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onSelectRole }) => {
+  const { t, language } = useLanguage();
+
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      {/* Hero section */}
-      <View style={styles.hero}>
-        <View style={styles.heroIconWrap}>
-          <Ionicons name="heart-circle" size={64} color={COLORS.primaryGreen} />
+      <View style={styles.headerBox}>
+        <View style={styles.logoMark}>
+          <Ionicons name="leaf" size={40} color={COLORS.primary} />
         </View>
-        <Text style={styles.title}>स्मृति सेतु</Text>
-        <Text style={styles.titleEn}>Smriti Setu</Text>
-        <Text style={styles.subtitle}>Bridge of Memories · Dementia Care & Support</Text>
+        <Text style={styles.title}>
+          {language === 'as' ? t('appNameAs') : t('appName')}
+        </Text>
+        <Text style={styles.subtitle}>{t('tagline')}</Text>
       </View>
 
-      {/* Role Cards */}
-      <View style={styles.cardsSection}>
-        <Text style={styles.sectionLabel}>Choose your role to continue</Text>
-
-        <RoleCard
-          icon="person"
-          iconBg={COLORS.mintGreen}
-          iconColor={COLORS.primaryGreen}
-          title="Patient View"
-          description="Calm, large-text interface with gentle cued reminders and audio assistance."
-          buttonLabel="Open Patient App"
-          buttonVariant="primary"
-          onPress={() => onSelectRole('patient')}
-          accentColor={COLORS.primaryGreen}
-        />
-
-        <RoleCard
-          icon="medical"
-          iconBg={COLORS.skyBlueLight}
-          iconColor={COLORS.skyBlue}
-          title="Caregiver View"
-          description="Cognitive domain trends, weekly summaries, and escalation monitoring."
-          buttonLabel="Open Caregiver App"
-          buttonVariant="secondary"
-          onPress={() => onSelectRole('caregiver')}
-          accentColor={COLORS.skyBlue}
-        />
+      <View style={styles.langBlock}>
+        <LanguageToggle />
       </View>
 
-      <Text style={styles.footerText}>Demo Framework · Mock data active</Text>
+      <View style={styles.cardBox}>
+        <Text style={styles.promptText}>{t('selectRole')}</Text>
+
+        <View style={styles.roleOption}>
+          <View style={styles.iconCirclePatient}>
+            <Ionicons name="person" size={32} color={COLORS.primary} />
+          </View>
+          <View style={styles.roleTextContainer}>
+            <Text style={styles.roleTitle}>{t('patientRole')}</Text>
+            <Text style={styles.roleDescription}>{t('patientRoleDesc')}</Text>
+          </View>
+          <AccessibleButton
+            title={t('openPatient')}
+            onPress={() => onSelectRole('patient')}
+            variant="primary"
+            iconName="arrow-forward-circle"
+          />
+        </View>
+
+        <View style={[styles.roleOption, { marginTop: SPACING.lg }]}>
+          <View style={styles.iconCircleCaregiver}>
+            <Ionicons name="people" size={32} color={COLORS.info} />
+          </View>
+          <View style={styles.roleTextContainer}>
+            <Text style={styles.roleTitle}>{t('caregiverRole')}</Text>
+            <Text style={styles.roleDescription}>{t('caregiverRoleDesc')}</Text>
+          </View>
+          <AccessibleButton
+            title={t('openCaregiver')}
+            onPress={() => onSelectRole('caregiver')}
+            variant="secondary"
+            iconName="analytics"
+          />
+        </View>
+      </View>
+
+      <View style={styles.footerNote}>
+        <Text style={styles.footerText}>{t('demoNote')}</Text>
+      </View>
     </ScrollView>
   );
 };
@@ -107,9 +124,8 @@ export const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onSele
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: COLORS.bgLight,
-    paddingHorizontal: SPACING.lg,
-    paddingBottom: SPACING.xl,
+    backgroundColor: COLORS.bg,
+    padding: SPACING.lg,
     justifyContent: 'center',
   },
   hero: {
@@ -123,15 +139,22 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     backgroundColor: COLORS.mintGreen,
     alignItems: 'center',
+    marginBottom: SPACING.lg,
+  },
+  logoMark: {
+    width: 80,
+    height: 80,
+    borderRadius: 28,
+    backgroundColor: COLORS.primarySoft,
+    alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: SPACING.md,
-    ...SHADOWS.md,
+    marginBottom: SPACING.sm,
   },
   title: {
     fontSize: 32,
     fontWeight: '800',
-    color: COLORS.textDark,
-    letterSpacing: -0.5,
+    color: COLORS.text,
+    marginTop: SPACING.xs,
     textAlign: 'center',
   },
   titleEn: {
@@ -144,40 +167,51 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: ACCESSIBILITY.fontSize.caption,
-    color: COLORS.textMuted,
-    marginTop: SPACING.xs,
+    color: COLORS.textSecondary,
+    marginTop: 6,
     textAlign: 'center',
     lineHeight: ACCESSIBILITY.lineHeight.caption,
   },
-  cardsSection: {
-    gap: SPACING.md,
+  langBlock: {
+    marginBottom: SPACING.lg,
+    alignItems: 'center',
+  },
+  cardBox: {
+    backgroundColor: COLORS.surface,
+    borderRadius: ACCESSIBILITY.borderRadius.lg,
+    padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   sectionLabel: {
     fontSize: ACCESSIBILITY.fontSize.caption,
     fontWeight: '700',
-    color: COLORS.textSubtle,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginBottom: SPACING.xs,
+    color: COLORS.text,
+    marginBottom: SPACING.md,
   },
-  roleCard: {
-    borderRadius: ACCESSIBILITY.borderRadius.lg,
-    backgroundColor: COLORS.surfaceElevated,
+  roleOption: {
+    backgroundColor: COLORS.bg,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
+    padding: SPACING.md,
     borderWidth: 1,
     borderColor: COLORS.border,
     overflow: 'hidden',
     ...SHADOWS.sm,
   },
-  roleCardInner: {
-    flexDirection: 'row',
+  iconCirclePatient: {
+    width: 56,
+    height: 56,
+    borderRadius: 20,
+    backgroundColor: COLORS.primarySoft,
     alignItems: 'center',
     padding: SPACING.md,
     gap: SPACING.md,
   },
-  iconCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
+  iconCircleCaregiver: {
+    width: 56,
+    height: 56,
+    borderRadius: 20,
+    backgroundColor: COLORS.infoBg,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
@@ -186,16 +220,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   roleTitle: {
-    fontSize: ACCESSIBILITY.fontSize.heading - 2,
-    fontWeight: '800',
-    color: COLORS.textDark,
-    marginBottom: 4,
-    letterSpacing: -0.2,
+    fontSize: ACCESSIBILITY.fontSize.heading,
+    fontWeight: '700',
+    color: COLORS.text,
   },
   roleDescription: {
-    fontSize: ACCESSIBILITY.fontSize.caption - 1,
-    color: COLORS.textMuted,
-    lineHeight: 20,
+    fontSize: ACCESSIBILITY.fontSize.caption,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+    lineHeight: ACCESSIBILITY.lineHeight.caption,
   },
   roleArrow: {
     width: 36,
@@ -206,10 +239,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   footerText: {
-    fontSize: ACCESSIBILITY.fontSize.micro,
-    color: COLORS.textSubtle,
-    textAlign: 'center',
-    marginTop: SPACING.xl,
-    letterSpacing: 0.3,
+    fontSize: ACCESSIBILITY.fontSize.caption,
+    color: COLORS.textSecondary,
   },
 });

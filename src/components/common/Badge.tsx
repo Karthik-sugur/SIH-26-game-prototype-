@@ -13,16 +13,16 @@ export const Badge: React.FC<BadgeProps> = ({ label, type = 'info', iconName }) 
   const getColors = () => {
     switch (type) {
       case 'success':
-        return { bg: COLORS.mintGreen, text: COLORS.primaryGreen, icon: 'trending-up' as const };
+        return { bg: COLORS.successBg, text: COLORS.success, icon: 'trending-up' as const };
       case 'warning':
-        return { bg: COLORS.peach, text: '#B45309', icon: 'alert-circle' as const };
+        return { bg: COLORS.warningBg, text: COLORS.warning, icon: 'alert-circle' as const };
       case 'error':
-        return { bg: '#FEE2E2', text: COLORS.error, icon: 'warning' as const };
+        return { bg: COLORS.errorBg, text: COLORS.error, icon: 'warning' as const };
       case 'stable':
-        return { bg: COLORS.softYellow, text: '#92400E', icon: 'remove-outline' as const };
+        return { bg: COLORS.tileSand, text: COLORS.warning, icon: 'remove-outline' as const };
       case 'info':
       default:
-        return { bg: '#DBEAFE', text: COLORS.info, icon: 'information-circle' as const };
+        return { bg: COLORS.infoBg, text: COLORS.info, icon: 'information-circle' as const };
     }
   };
 
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
     paddingHorizontal: SPACING.sm,
-    paddingVertical: 4,
+    paddingVertical: 6,
     borderRadius: ACCESSIBILITY.borderRadius.pill,
   },
   text: {

@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS, SPACING, ACCESSIBILITY, SHADOWS } from '../../theme/tokens';
 import { UserRole } from '../../types';
 import { Ionicons } from '@expo/vector-icons';
+import { LanguageToggle } from './LanguageToggle';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface RoleHeaderProps {
   currentRole: UserRole;
@@ -10,21 +12,28 @@ interface RoleHeaderProps {
 }
 
 export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRole }) => {
+  const { t, language } = useLanguage();
+
   return (
     <View style={styles.header}>
       <View style={styles.brandRow}>
         <View style={styles.logoMark}>
-          <Ionicons name="heart-circle" size={22} color={COLORS.white} />
+          <Ionicons name="leaf" size={18} color={COLORS.primary} />
         </View>
-        <Text style={styles.brandTitle}>Smriti Setu</Text>
+        <Text style={styles.brandTitle}>
+          {language === 'as' ? t('appNameAs') : t('appName')}
+        </Text>
+        <View style={{ flex: 1 }} />
+        <LanguageToggle />
       </View>
+
       <View style={styles.switcherRow}>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => onSwitchRole('patient')}
           style={[
             styles.roleChip,
-            currentRole === 'patient' ? styles.activeChipPatient : styles.inactiveChip,
+            currentRole === 'patient' ? styles.activeChip : styles.inactiveChip,
           ]}
         >
           <Ionicons
@@ -38,7 +47,7 @@ export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRol
               currentRole === 'patient' ? styles.activeText : styles.inactiveText,
             ]}
           >
-            Patient
+            {t('patientMode')}
           </Text>
         </TouchableOpacity>
 
@@ -47,7 +56,7 @@ export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRol
           onPress={() => onSwitchRole('caregiver')}
           style={[
             styles.roleChip,
-            currentRole === 'caregiver' ? styles.activeChipCaregiver : styles.inactiveChip,
+            currentRole === 'caregiver' ? styles.activeChip : styles.inactiveChip,
           ]}
         >
           <Ionicons
@@ -61,7 +70,7 @@ export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRol
               currentRole === 'caregiver' ? styles.activeText : styles.inactiveText,
             ]}
           >
-            Caregiver
+            {t('caregiverMode')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -71,35 +80,31 @@ export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRol
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: COLORS.white,
-    paddingTop: SPACING.sm,
+    backgroundColor: COLORS.surface,
+    paddingTop: SPACING.md,
     paddingBottom: SPACING.sm,
     paddingHorizontal: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    ...SHADOWS.sm,
+    gap: SPACING.sm,
   },
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SPACING.xs,
+    gap: 10,
   },
   logoMark: {
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
     borderRadius: 10,
-    backgroundColor: COLORS.primaryGreen,
+    backgroundColor: COLORS.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   brandTitle: {
     fontSize: 17,
     fontWeight: '800',
-    color: COLORS.textDark,
-    letterSpacing: -0.3,
+    color: COLORS.text,
   },
   switcherRow: {
     flexDirection: 'row',
@@ -111,7 +116,10 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   roleChip: {
-    flexDirection: 'row',
+    flex: 1,
+    minHeight: 48,
+    paddingVertical: 10,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
     alignItems: 'center',
     gap: 5,
     paddingVertical: 6,
@@ -119,24 +127,21 @@ const styles = StyleSheet.create({
     borderRadius: ACCESSIBILITY.borderRadius.pill,
   },
   inactiveChip: {
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.surfaceMuted,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  activeChipPatient: {
-    backgroundColor: COLORS.primaryGreen,
-    ...SHADOWS.colored(COLORS.primaryGreen),
-  },
-  activeChipCaregiver: {
-    backgroundColor: COLORS.skyBlue,
-    ...SHADOWS.colored(COLORS.skyBlue),
+  activeChip: {
+    backgroundColor: COLORS.primary,
   },
   chipText: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
   },
   activeText: {
-    color: COLORS.white,
+    color: COLORS.textOnPrimary,
   },
   inactiveText: {
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
   },
 });

@@ -48,7 +48,7 @@ export interface GamePrompt {
 }
 
 export interface CognitiveDomainScore {
-  domain: 'Memory' | 'Attention' | 'Executive Function' | 'Language' | 'Visuospatial';
+  domain: string;
   score: number; // 0 - 100
   trend: 'improving' | 'stable' | 'declining';
   changeDescription: string;
@@ -70,6 +70,6 @@ export interface EscalationAlert {
   title: string;
   reason: string;
   suggestedAction: string;
-  contactTarget: 'Clinician Dr. Sharma' | 'ARDSI Helpline' | 'Family Emergency';
+  contactTarget: string;
   resolved: boolean;
 }

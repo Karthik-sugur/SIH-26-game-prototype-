@@ -4,80 +4,62 @@ import { COLORS, SPACING, ACCESSIBILITY, SHADOWS } from '../../theme/tokens';
 import { AccessibleButton } from '../../components/common/AccessibleButton';
 import { useCaregiverData } from '../../services/useCaregiverData';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export const EscalationAlertScreen: React.FC = () => {
   const { alerts, resolveAlert } = useCaregiverData();
+  const { t } = useLanguage();
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Clinician & ARDSI Escalation Alerts</Text>
-      <Text style={styles.subtitle}>
-        Suggested medical / community support escalations based on cognitive metrics
-      </Text>
+      <Text style={styles.title}>{t('escalationTitle')}</Text>
+      <Text style={styles.subtitle}>{t('escalationSub')}</Text>
 
       {alerts.map((alert) => (
         <View
           key={alert.id}
-          style={[
-            styles.alertCard,
-            alert.resolved ? styles.alertResolved : styles.alertActive,
-          ]}
+          bgColor={alert.resolved ? COLORS.surfaceMuted : COLORS.errorBg}
+          borderColor={alert.resolved ? COLORS.border : COLORS.error}
+          style={styles.alertCard}
         >
           <View style={styles.alertHeader}>
             <View style={styles.titleRow}>
-              <View
-                style={[
-                  styles.alertIconWrap,
-                  { backgroundColor: alert.resolved ? COLORS.successLight : COLORS.errorLight },
-                ]}
-              >
-                <Ionicons
-                  name={alert.resolved ? 'checkmark-circle' : 'warning'}
-                  size={20}
-                  color={alert.resolved ? COLORS.primaryGreen : COLORS.error}
-                />
-              </View>
+              <Ionicons
+                name={alert.resolved ? 'checkmark-circle' : 'warning'}
+                size={24}
+                color={alert.resolved ? COLORS.primary : COLORS.error}
+              />
               <Text style={styles.alertTitle}>{alert.title}</Text>
             </View>
-
-            <View
-              style={[
-                styles.badge,
-                { backgroundColor: alert.resolved ? COLORS.successLight : COLORS.errorLight },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.badgeText,
-                  { color: alert.resolved ? COLORS.primaryGreen : COLORS.error },
-                ]}
-              >
-                {alert.resolved ? 'Resolved' : 'Action Required'}
-              </Text>
-            </View>
+            <Badge
+              label={alert.resolved ? t('resolved') : t('actionRequired')}
+              type={alert.resolved ? 'success' : 'error'}
+            />
           </View>
 
-          <Text style={styles.dateText}>Observed Date: {alert.date}</Text>
+          <Text style={styles.dateText}>{t('observedDate', { date: alert.date })}</Text>
 
           <View style={styles.sectionBox}>
-            <Text style={styles.label}>Reason for Escalation Recommendation:</Text>
+            <Text style={styles.label}>{t('reasonLabel')}</Text>
             <Text style={styles.valueText}>{alert.reason}</Text>
           </View>
 
           <View style={styles.sectionBox}>
-            <Text style={styles.label}>Suggested Next Step:</Text>
+            <Text style={styles.label}>{t('nextStepLabel')}</Text>
             <Text style={styles.valueText}>{alert.suggestedAction}</Text>
           </View>
 
           <View style={styles.contactTargetBox}>
-            <Ionicons name="call-outline" size={18} color={COLORS.skyBlue} />
-            <Text style={styles.targetText}>Recommended Target: {alert.contactTarget}</Text>
+            <Ionicons name="call-outline" size={20} color={COLORS.info} />
+            <Text style={styles.targetText}>
+              {t('recommendedTarget', { target: alert.contactTarget })}
+            </Text>
           </View>
 
           {!alert.resolved && (
             <View style={styles.buttonRow}>
               <AccessibleButton
-                title={`Notify ${alert.contactTarget}`}
+                title={t('notify', { target: alert.contactTarget })}
                 onPress={() => resolveAlert(alert.id)}
                 variant="warning"
                 iconName="send"
@@ -88,25 +70,14 @@ export const EscalationAlertScreen: React.FC = () => {
         </View>
       ))}
 
-      {/* ARDSI Helpline Information Card */}
-      <View style={styles.ardsiCard}>
+      <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.ardsiCard}>
         <View style={styles.ardsiHeader}>
-          <View style={styles.ardsiIconWrap}>
-            <Ionicons name="medical" size={22} color={COLORS.primaryGreen} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.ardsiTitle}>ARDSI India Support Helpline</Text>
-            <Text style={styles.ardsiSub}>Dementia Care Guidance</Text>
-          </View>
+          <Ionicons name="medical-outline" size={28} color={COLORS.primary} />
+          <Text style={styles.ardsiTitle}>{t('ardsiTitle')}</Text>
         </View>
-        <Text style={styles.ardsiDesc}>
-          Alzheimer's and Related Disorders Society of India (ARDSI) provides national guidance, caregiver training, and dementia support groups.
-        </Text>
-        <View style={styles.phoneBadge}>
-          <Ionicons name="call" size={16} color={COLORS.primaryGreen} />
-          <Text style={styles.ardsiPhone}>National Helpline: +91 98461 54400</Text>
-        </View>
-      </View>
+        <Text style={styles.ardsiDesc}>{t('ardsiDesc')}</Text>
+        <Text style={styles.ardsiPhone}>{t('ardsiPhone')}</Text>
+      </Card>
     </ScrollView>
   );
 };
@@ -114,20 +85,20 @@ export const EscalationAlertScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.md,
-    backgroundColor: COLORS.bgLight,
+    backgroundColor: COLORS.bg,
     flexGrow: 1,
     gap: SPACING.sm,
   },
   title: {
     fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '800',
-    color: COLORS.textDark,
-    letterSpacing: -0.3,
+    color: COLORS.text,
   },
   subtitle: {
-    fontSize: ACCESSIBILITY.fontSize.caption - 1,
-    color: COLORS.textMuted,
-    marginBottom: SPACING.xs,
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.md,
+    lineHeight: 22,
   },
   alertCard: {
     backgroundColor: COLORS.surfaceElevated,
@@ -150,6 +121,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 4,
+    gap: SPACING.xs,
+    flexWrap: 'wrap',
   },
   titleRow: {
     flexDirection: 'row',
@@ -167,52 +140,42 @@ const styles = StyleSheet.create({
   alertTitle: {
     fontSize: 15,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
     flex: 1,
   },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: ACCESSIBILITY.borderRadius.pill,
-  },
-  badgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-  },
   dateText: {
-    fontSize: 12,
-    color: COLORS.textMuted,
-    marginBottom: 4,
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xs,
   },
   sectionBox: {
     marginVertical: 2,
   },
   label: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '700',
-    color: COLORS.textSubtle,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    color: COLORS.textSecondary,
   },
   valueText: {
-    fontSize: 13,
-    color: COLORS.textDark,
+    fontSize: 15,
+    color: COLORS.text,
     marginTop: 2,
-    lineHeight: 18,
+    lineHeight: 22,
   },
   contactTargetBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.skyBlueLight,
-    padding: 10,
+    backgroundColor: COLORS.infoBg,
+    padding: SPACING.sm,
     borderRadius: ACCESSIBILITY.borderRadius.sm,
     marginVertical: 6,
     gap: 6,
   },
   targetText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '700',
-    color: COLORS.skyBlue,
+    color: COLORS.info,
+    flex: 1,
   },
   buttonRow: {
     marginTop: 4,
@@ -243,16 +206,17 @@ const styles = StyleSheet.create({
   ardsiTitle: {
     fontSize: 15,
     fontWeight: '800',
-    color: COLORS.primaryGreen,
+    color: COLORS.primary,
+    flex: 1,
   },
   ardsiSub: {
     fontSize: 12,
     color: COLORS.textMuted,
   },
   ardsiDesc: {
-    fontSize: 13,
-    color: COLORS.textMuted,
-    lineHeight: 18,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    lineHeight: 20,
   },
   phoneBadge: {
     flexDirection: 'row',
@@ -266,8 +230,9 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   ardsiPhone: {
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: '800',
-    color: COLORS.primaryGreen,
+    color: COLORS.primary,
+    marginTop: 8,
   },
 });
