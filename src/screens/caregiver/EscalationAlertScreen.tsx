@@ -1,9 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { COLORS, SPACING, ACCESSIBILITY } from '../../theme/tokens';
-import { Card } from '../../components/common/Card';
+import { COLORS, SPACING, ACCESSIBILITY, SHADOWS } from '../../theme/tokens';
 import { AccessibleButton } from '../../components/common/AccessibleButton';
-import { Badge } from '../../components/common/Badge';
 import { useCaregiverData } from '../../services/useCaregiverData';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../i18n/LanguageContext';
@@ -18,7 +16,7 @@ export const EscalationAlertScreen: React.FC = () => {
       <Text style={styles.subtitle}>{t('escalationSub')}</Text>
 
       {alerts.map((alert) => (
-        <Card
+        <View
           key={alert.id}
           bgColor={alert.resolved ? COLORS.surfaceMuted : COLORS.errorBg}
           borderColor={alert.resolved ? COLORS.border : COLORS.error}
@@ -69,7 +67,7 @@ export const EscalationAlertScreen: React.FC = () => {
               />
             </View>
           )}
-        </Card>
+        </View>
       ))}
 
       <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.ardsiCard}>
@@ -89,9 +87,10 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     backgroundColor: COLORS.bg,
     flexGrow: 1,
+    gap: SPACING.sm,
   },
   title: {
-    fontSize: 22,
+    fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '800',
     color: COLORS.text,
   },
@@ -102,8 +101,20 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   alertCard: {
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
     padding: SPACING.md,
-    marginBottom: SPACING.md,
+    borderWidth: 1,
+    gap: 4,
+    ...SHADOWS.sm,
+  },
+  alertActive: {
+    borderColor: COLORS.error + '40',
+    backgroundColor: '#FFF8F8',
+  },
+  alertResolved: {
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surfaceElevated,
   },
   alertHeader: {
     flexDirection: 'row',
@@ -116,11 +127,18 @@ const styles = StyleSheet.create({
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
     flex: 1,
   },
+  alertIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   alertTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '800',
     color: COLORS.text,
     flex: 1,
@@ -131,7 +149,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xs,
   },
   sectionBox: {
-    marginVertical: 4,
+    marginVertical: 2,
   },
   label: {
     fontSize: 13,
@@ -150,7 +168,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.infoBg,
     padding: SPACING.sm,
     borderRadius: ACCESSIBILITY.borderRadius.sm,
-    marginVertical: SPACING.xs,
+    marginVertical: 6,
     gap: 6,
   },
   targetText: {
@@ -160,28 +178,56 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonRow: {
-    marginTop: SPACING.xs,
+    marginTop: 4,
   },
   ardsiCard: {
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
     padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.mintGreenDark,
     marginTop: SPACING.xs,
+    gap: SPACING.xs,
+    ...SHADOWS.sm,
   },
   ardsiHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.xs,
-    marginBottom: 6,
+  },
+  ardsiIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: COLORS.mintGreen,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   ardsiTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '800',
     color: COLORS.primary,
     flex: 1,
+  },
+  ardsiSub: {
+    fontSize: 12,
+    color: COLORS.textMuted,
   },
   ardsiDesc: {
     fontSize: 14,
     color: COLORS.textSecondary,
     lineHeight: 20,
+  },
+  phoneBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: COLORS.mintGreen,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: ACCESSIBILITY.borderRadius.pill,
+    alignSelf: 'flex-start',
+    marginTop: 4,
   },
   ardsiPhone: {
     fontSize: 16,

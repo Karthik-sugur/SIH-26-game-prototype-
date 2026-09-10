@@ -54,11 +54,12 @@ export const CaregiverRemindersScreen: React.FC = () => {
 
           <Text style={styles.label}>{t('questionPrompt')}</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { minHeight: 60 }]}
             value={question}
             placeholder={t('defaultNewQuestion')}
             onChangeText={setQuestion}
             multiline
+            placeholderTextColor={COLORS.textSubtle}
           />
 
           <Text style={styles.label}>{t('subtitleContext')}</Text>
@@ -75,7 +76,7 @@ export const CaregiverRemindersScreen: React.FC = () => {
             variant="primary"
             iconName="save-outline"
           />
-        </Card>
+        </View>
       )}
 
       <Text style={styles.sectionTitle}>{t('activeSchedule')}</Text>
@@ -90,10 +91,11 @@ export const CaregiverRemindersScreen: React.FC = () => {
             <Text style={styles.categoryText}>{categoryLabel(item.category)}</Text>
           </View>
 
-          <Text style={styles.promptText}>{item.questionPrompt}</Text>
-          <Text style={styles.subText}>{item.subtitle}</Text>
-        </Card>
-      ))}
+            <Text style={styles.promptText}>"{item.questionPrompt}"</Text>
+            <Text style={styles.subText}>{item.subtitle}</Text>
+          </View>
+        ))}
+      </View>
     </ScrollView>
   );
 };
@@ -103,6 +105,7 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     backgroundColor: COLORS.bg,
     flexGrow: 1,
+    gap: SPACING.md,
   },
   header: {
     flexDirection: 'row',
@@ -112,7 +115,7 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
   },
   title: {
-    fontSize: 22,
+    fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '800',
     color: COLORS.text,
   },
@@ -120,12 +123,32 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: COLORS.textSecondary,
   },
+  toggleFormButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: COLORS.skyBlue,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: ACCESSIBILITY.borderRadius.pill,
+    ...SHADOWS.colored(COLORS.skyBlue),
+  },
+  toggleFormText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.white,
+  },
   formCard: {
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
     padding: SPACING.md,
-    marginBottom: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.skyBlue,
+    ...SHADOWS.md,
+    gap: 6,
   },
   formTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '800',
     color: COLORS.text,
     marginBottom: SPACING.xs,
@@ -148,14 +171,18 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: ACCESSIBILITY.fontSize.heading - 4,
     fontWeight: '800',
     color: COLORS.text,
     marginBottom: SPACING.xs,
   },
   itemCard: {
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
     padding: SPACING.md,
-    marginBottom: SPACING.xs,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.sm,
   },
   itemHeader: {
     flexDirection: 'row',
@@ -173,6 +200,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.info,
   },
+  categoryBadge: {
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: ACCESSIBILITY.borderRadius.pill,
+  },
   categoryText: {
     fontSize: 13,
     fontWeight: '700',
@@ -180,7 +213,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   promptText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: COLORS.text,
   },

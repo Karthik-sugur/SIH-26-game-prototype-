@@ -1,11 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { COLORS, SPACING, ACCESSIBILITY } from '../../theme/tokens';
-import { Card } from '../../components/common/Card';
-import { Badge } from '../../components/common/Badge';
+import { COLORS, SPACING, ACCESSIBILITY, SHADOWS } from '../../theme/tokens';
 import { useCaregiverData } from '../../services/useCaregiverData';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../i18n/LanguageContext';
+
+const DOMAIN_COLOR: Record<string, string> = {
+  Memory: COLORS.primaryGreen,
+  Attention: COLORS.skyBlue,
+  'Executive Function': COLORS.lavender,
+  Language: COLORS.warmOrange,
+  Visuospatial: COLORS.teal,
+};
 
 export const PatientDetailScreen: React.FC = () => {
   const { domainScores, trendLabel } = useCaregiverData();
@@ -49,12 +55,13 @@ export const PatientDetailScreen: React.FC = () => {
             />
           </View>
 
-          <View style={styles.scoreRow}>
-            <Text style={styles.scoreText}>{item.score} / 100</Text>
-            <Text style={styles.descText}>{item.changeDescription}</Text>
+            <View style={styles.scoreRow}>
+              <Text style={[styles.scoreText, { color }]}>{item.score} / 100</Text>
+              <Text style={styles.descText}>{item.changeDescription}</Text>
+            </View>
           </View>
-        </Card>
-      ))}
+        );
+      })}
 
       <Text style={[styles.title, { marginTop: SPACING.md }]}>{t('recentHistory')}</Text>
 
@@ -76,7 +83,7 @@ export const PatientDetailScreen: React.FC = () => {
           </View>
           <Text style={styles.sessionScore}>{t('hesitation')}</Text>
         </View>
-      </Card>
+      </View>
     </ScrollView>
   );
 };
@@ -86,9 +93,10 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     backgroundColor: COLORS.bg,
     flexGrow: 1,
+    gap: SPACING.xs,
   },
   title: {
-    fontSize: 22,
+    fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '800',
     color: COLORS.text,
   },
@@ -97,9 +105,14 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginBottom: SPACING.md,
   },
-  domainDetailCard: {
+  domainCard: {
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
     padding: SPACING.md,
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.xs,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.sm,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -108,9 +121,22 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xs,
   },
   domainName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: COLORS.text,
+  },
+  trendBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: ACCESSIBILITY.borderRadius.pill,
+  },
+  trendText: {
+    fontSize: 11,
+    fontWeight: '700',
+    textTransform: 'capitalize',
   },
   barContainer: {
     height: 14,
@@ -142,13 +168,25 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   historyCard: {
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
     padding: SPACING.md,
-    marginTop: SPACING.xs,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.sm,
+    gap: SPACING.sm,
   },
   sessionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SPACING.xs,
+    gap: SPACING.sm,
+  },
+  sessionIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sessionTitle: {
     fontSize: 15,
@@ -159,8 +197,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textSecondary,
   },
+  scoreBadge: {
+    backgroundColor: COLORS.mintGreen,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: ACCESSIBILITY.borderRadius.pill,
+  },
   sessionScore: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
     color: COLORS.primary,
   },

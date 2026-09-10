@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { COLORS, ACCESSIBILITY, SPACING } from '../../theme/tokens';
+import { COLORS, ACCESSIBILITY, SPACING, SHADOWS } from '../../theme/tokens';
 import { Card } from '../../components/common/Card';
 import { AccessibleButton } from '../../components/common/AccessibleButton';
 import { AudioNarrationButton } from '../../components/common/AudioNarrationButton';
@@ -23,6 +23,7 @@ export const PatientHomeScreen: React.FC<PatientHomeScreenProps> = ({
   const { t } = useLanguage();
 
   const nextReminder = reminders.find((r) => !r.completedToday) || reminders[0];
+  const completedCount = reminders.filter((r) => r.completedToday).length;
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
@@ -43,7 +44,12 @@ export const PatientHomeScreen: React.FC<PatientHomeScreenProps> = ({
             <Text style={styles.streakSubtitle}>{t('streakSubtitle')}</Text>
           </View>
         </View>
-      </Card>
+        <View style={styles.streakDivider} />
+        <View style={styles.streakRight}>
+          <Text style={styles.streakRightNum}>{completedCount}/{reminders.length}</Text>
+          <Text style={styles.streakRightLabel}>Done Today</Text>
+        </View>
+      </View>
 
       <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.cueCard}>
         <View style={styles.cueHeaderRow}>
@@ -51,14 +57,16 @@ export const PatientHomeScreen: React.FC<PatientHomeScreenProps> = ({
           <AudioNarrationButton textToNarrate={nextReminder.audioNarrationText} />
         </View>
 
-        <Text style={styles.cueQuestion}>"{nextReminder.questionPrompt}"</Text>
+        <Text style={styles.cueQuestion}>
+          "{nextReminder.questionPrompt}"
+        </Text>
         <Text style={styles.cueSubtitle}>{nextReminder.subtitle}</Text>
 
         <AccessibleButton
           title={t('checkCues')}
           onPress={onViewReminders}
-          variant="secondary"
-          iconName="help-circle-outline"
+          variant="outline"
+          iconName="list"
         />
       </Card>
 
@@ -73,8 +81,9 @@ export const PatientHomeScreen: React.FC<PatientHomeScreenProps> = ({
           onPress={onStartActivity}
           variant="primary"
           iconName="play-circle"
+          size="normal"
         />
-      </Card>
+      </View>
     </ScrollView>
   );
 };
@@ -84,12 +93,25 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     backgroundColor: COLORS.bg,
     flexGrow: 1,
+    gap: SPACING.md,
   },
-  greetingHeader: {
-    marginBottom: SPACING.md,
+  greetingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+    paddingTop: SPACING.xs,
+  },
+  avatarCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.mintGreen,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...SHADOWS.sm,
   },
   namasteText: {
-    fontSize: ACCESSIBILITY.fontSize.title,
+    fontSize: ACCESSIBILITY.fontSize.heading,
     fontWeight: '800',
     color: COLORS.text,
   },
@@ -100,12 +122,18 @@ const styles = StyleSheet.create({
     lineHeight: ACCESSIBILITY.lineHeight.body,
   },
   streakCard: {
-    marginBottom: SPACING.md,
-  },
-  streakRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SPACING.md,
+    backgroundColor: COLORS.warmOrange,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
+    padding: SPACING.md,
+    ...SHADOWS.colored(COLORS.warmOrange),
+  },
+  streakLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
   },
   starCircle: {
     width: 52,
@@ -115,8 +143,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  streakTitle: {
-    fontSize: ACCESSIBILITY.fontSize.heading - 2,
+  streakNumber: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: COLORS.white,
+    letterSpacing: -0.5,
+    lineHeight: 32,
+  },
+  streakLabel: {
+    fontSize: ACCESSIBILITY.fontSize.micro,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.85)',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  streakDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    marginHorizontal: SPACING.md,
+  },
+  streakRight: {
+    alignItems: 'center',
+  },
+  streakRightNum: {
+    fontSize: 20,
     fontWeight: '800',
     color: COLORS.text,
   },
@@ -126,11 +177,10 @@ const styles = StyleSheet.create({
     marginTop: 2,
     lineHeight: ACCESSIBILITY.lineHeight.caption,
   },
-  cueCard: {
-    marginBottom: SPACING.md,
+  section: {
     padding: SPACING.lg,
   },
-  cueHeaderRow: {
+  cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -144,7 +194,7 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
   cueQuestion: {
-    fontSize: ACCESSIBILITY.fontSize.heading,
+    fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '700',
     color: COLORS.text,
     marginVertical: SPACING.xs,
@@ -157,13 +207,22 @@ const styles = StyleSheet.create({
     lineHeight: ACCESSIBILITY.lineHeight.body,
   },
   activityCard: {
-    padding: SPACING.lg,
-  },
-  activityHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: COLORS.primaryGreen,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
+    padding: SPACING.md,
     gap: SPACING.sm,
-    marginBottom: SPACING.xs,
+    ...SHADOWS.colored(COLORS.primaryGreen),
+  },
+  activityIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
   activityTitle: {
     fontSize: ACCESSIBILITY.fontSize.heading,

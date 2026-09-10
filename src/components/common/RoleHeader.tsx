@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS, SPACING, ACCESSIBILITY } from '../../theme/tokens';
+import { COLORS, SPACING, ACCESSIBILITY, SHADOWS } from '../../theme/tokens';
 import { UserRole } from '../../types';
 import { Ionicons } from '@expo/vector-icons';
 import { LanguageToggle } from './LanguageToggle';
@@ -29,13 +29,18 @@ export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRol
 
       <View style={styles.switcherRow}>
         <TouchableOpacity
-          activeOpacity={0.7}
+          activeOpacity={0.8}
           onPress={() => onSwitchRole('patient')}
           style={[
             styles.roleChip,
             currentRole === 'patient' ? styles.activeChip : styles.inactiveChip,
           ]}
         >
+          <Ionicons
+            name="person"
+            size={14}
+            color={currentRole === 'patient' ? COLORS.white : COLORS.textMuted}
+          />
           <Text
             style={[
               styles.chipText,
@@ -47,13 +52,18 @@ export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRol
         </TouchableOpacity>
 
         <TouchableOpacity
-          activeOpacity={0.7}
+          activeOpacity={0.8}
           onPress={() => onSwitchRole('caregiver')}
           style={[
             styles.roleChip,
             currentRole === 'caregiver' ? styles.activeChip : styles.inactiveChip,
           ]}
         >
+          <Ionicons
+            name="medical"
+            size={14}
+            color={currentRole === 'caregiver' ? COLORS.white : COLORS.textMuted}
+          />
           <Text
             style={[
               styles.chipText,
@@ -98,7 +108,12 @@ const styles = StyleSheet.create({
   },
   switcherRow: {
     flexDirection: 'row',
-    gap: SPACING.xs,
+    gap: 6,
+    backgroundColor: COLORS.surface,
+    padding: 4,
+    borderRadius: ACCESSIBILITY.borderRadius.pill,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   roleChip: {
     flex: 1,
@@ -106,7 +121,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: ACCESSIBILITY.borderRadius.md,
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 5,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: ACCESSIBILITY.borderRadius.pill,
   },
   inactiveChip: {
     backgroundColor: COLORS.surfaceMuted,

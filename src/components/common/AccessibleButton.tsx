@@ -6,10 +6,11 @@ import { Ionicons } from '@expo/vector-icons';
 interface AccessibleButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'accent' | 'warning' | 'outline';
+  variant?: 'primary' | 'secondary' | 'accent' | 'warning' | 'outline' | 'ghost';
   iconName?: keyof typeof Ionicons.glyphMap;
   disabled?: boolean;
   style?: ViewStyle;
+  size?: 'normal' | 'large';
 }
 
 export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
@@ -19,6 +20,7 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
   iconName,
   disabled = false,
   style,
+  size = 'normal',
 }) => {
   const getBackgroundColor = () => {
     if (disabled) return COLORS.border;
@@ -44,6 +46,10 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
     if (variant === 'accent' || variant === 'warning') return COLORS.white;
     return COLORS.textOnPrimary;
   };
+
+  const cfg = disabled
+    ? { bg: COLORS.border, text: COLORS.textMuted, shadow: {} }
+    : config[variant];
 
   return (
     <TouchableOpacity
@@ -80,11 +86,15 @@ const styles = StyleSheet.create({
     marginVertical: SPACING.xs,
   },
   icon: {
-    marginRight: SPACING.sm,
+    marginRight: 10,
   },
   text: {
     fontSize: ACCESSIBILITY.fontSize.body,
     fontWeight: '700',
     textAlign: 'center',
+    letterSpacing: 0.1,
+  },
+  textLarge: {
+    fontSize: ACCESSIBILITY.fontSize.heading - 2,
   },
 });

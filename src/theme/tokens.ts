@@ -82,3 +82,35 @@ export const ACCESSIBILITY = {
     pill: 999,
   },
 };
+
+// Shared shadow tokens — soft, layered, no hard offsets
+export const SHADOWS = {
+  sm: {
+    shadowColor: '#94A3B8',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.10,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: '#64748B',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.10,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  lg: {
+    shadowColor: '#475569',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.10,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  colored: (hex: string) => ({
+    shadowColor: hex,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 4,
+  }),
+};

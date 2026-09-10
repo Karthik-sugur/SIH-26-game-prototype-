@@ -1,7 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { COLORS, ACCESSIBILITY, SPACING } from '../../theme/tokens';
-import { Card } from '../../components/common/Card';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import { COLORS, ACCESSIBILITY, SPACING, SHADOWS } from '../../theme/tokens';
 import { AudioNarrationButton } from '../../components/common/AudioNarrationButton';
 import { useReminders } from '../../services/useReminders';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,8 +30,7 @@ export const PatientRemindersScreen: React.FC = () => {
             <AudioNarrationButton textToNarrate={item.audioNarrationText} />
           </View>
 
-          <Text style={styles.questionText}>"{item.questionPrompt}"</Text>
-          <Text style={styles.subtitleText}>{item.subtitle}</Text>
+      <Text style={styles.subheading}>Warm reminders, not alarms.</Text>
 
           <TouchableOpacity
             activeOpacity={0.8}
@@ -71,8 +69,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bg,
     flexGrow: 1,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.xs,
+  },
   heading: {
-    fontSize: ACCESSIBILITY.fontSize.title,
+    fontSize: ACCESSIBILITY.fontSize.heading,
     fontWeight: '800',
     color: COLORS.text,
   },
@@ -82,20 +86,36 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
     lineHeight: ACCESSIBILITY.lineHeight.body,
   },
-  reminderCard: {
-    padding: SPACING.lg,
-    marginBottom: SPACING.md,
+  list: {
+    gap: SPACING.sm,
   },
-  timeCategoryRow: {
+  row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
+    padding: SPACING.md,
+    gap: SPACING.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.sm,
+  },
+  rowDone: {
+    backgroundColor: COLORS.successLight,
+    borderColor: COLORS.mintGreenDark,
+  },
+  catIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     alignItems: 'center',
     marginBottom: SPACING.sm,
     gap: SPACING.sm,
     flexWrap: 'wrap',
   },
-  timeBadge: {
+  rowHeaderLine: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: COLORS.surfaceMuted,
     paddingHorizontal: SPACING.sm,
@@ -104,12 +124,12 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   timeText: {
-    fontSize: ACCESSIBILITY.fontSize.caption,
+    fontSize: ACCESSIBILITY.fontSize.micro,
     fontWeight: '700',
     color: COLORS.text,
   },
   questionText: {
-    fontSize: ACCESSIBILITY.fontSize.heading - 2,
+    fontSize: ACCESSIBILITY.fontSize.body - 2,
     fontWeight: '700',
     color: COLORS.text,
     marginVertical: SPACING.xs,
@@ -124,14 +144,15 @@ const styles = StyleSheet.create({
     minHeight: ACCESSIBILITY.minTouchTargetHeight,
     borderRadius: ACCESSIBILITY.borderRadius.md,
     borderWidth: 2,
-    flexDirection: 'row',
+    borderColor: COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: SPACING.md,
-    gap: SPACING.xs,
+    flexShrink: 0,
+    alignSelf: 'center',
   },
-  checkButtonText: {
-    fontSize: ACCESSIBILITY.fontSize.body,
-    fontWeight: '700',
+  checkCircleDone: {
+    backgroundColor: COLORS.primaryGreen,
+    borderColor: COLORS.primaryGreen,
+    ...SHADOWS.colored(COLORS.primaryGreen),
   },
 });

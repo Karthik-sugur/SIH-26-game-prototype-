@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { COLORS, ACCESSIBILITY, SPACING } from '../../theme/tokens';
-import { Card } from '../../components/common/Card';
-import { AccessibleButton } from '../../components/common/AccessibleButton';
+import { COLORS, ACCESSIBILITY, SPACING, SHADOWS } from '../../theme/tokens';
 import { AudioNarrationButton } from '../../components/common/AudioNarrationButton';
+import { AccessibleButton } from '../../components/common/AccessibleButton';
 import { useGameSession } from '../../services/useGameSession';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../i18n/LanguageContext';
@@ -57,18 +56,18 @@ export const GameSessionScreen: React.FC = () => {
               <View key={obj.id} style={styles.objectBox}>
                 <Text style={styles.objectEmoji}>{obj.imageUrl}</Text>
                 <Text style={styles.objectName}>{obj.name}</Text>
-                <Text style={styles.objectHinName}>{obj.hinName}</Text>
+                <Text style={styles.objectHin}>{obj.hinName}</Text>
               </View>
             ))}
           </View>
-
           <AccessibleButton
             title={t('memorized')}
             onPress={startRecall}
             variant="primary"
             iconName="checkmark-circle"
+            size="large"
           />
-        </Card>
+        </View>
       )}
 
       {stage === 'recall' && (
@@ -81,14 +80,15 @@ export const GameSessionScreen: React.FC = () => {
             onPress={showRecognitionFallback}
             variant="accent"
             iconName="bulb-outline"
+            size="large"
           />
           <AccessibleButton
             title={t('giveHint')}
             onPress={showRecognitionFallback}
-            variant="secondary"
+            variant="ghost"
             iconName="help-buoy-outline"
           />
-        </Card>
+        </View>
       )}
 
       {stage === 'recognition' && (
@@ -108,7 +108,7 @@ export const GameSessionScreen: React.FC = () => {
               </TouchableOpacity>
             ))}
           </View>
-        </Card>
+        </View>
       )}
 
       {stage === 'completed' && (
@@ -133,10 +133,11 @@ export const GameSessionScreen: React.FC = () => {
           <AccessibleButton
             title={t('tryAgain')}
             onPress={resetSession}
-            variant="primary"
+            variant={isCorrect ? 'primary' : 'outline'}
             iconName="refresh-circle"
+            size="large"
           />
-        </Card>
+        </View>
       )}
     </ScrollView>
   );
@@ -147,8 +148,9 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     backgroundColor: COLORS.bg,
     flexGrow: 1,
+    gap: SPACING.sm,
   },
-  headerRow: {
+  headerBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -156,17 +158,18 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
     flexWrap: 'wrap',
   },
-  domainChip: {
+  domainPill: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.primarySoft,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 8,
     borderRadius: ACCESSIBILITY.borderRadius.pill,
-    gap: 6,
+    borderWidth: 1,
+    borderColor: COLORS.lavender + '44',
   },
-  domainText: {
-    fontSize: ACCESSIBILITY.fontSize.caption,
+  domainPillText: {
+    fontSize: ACCESSIBILITY.fontSize.caption - 1,
     fontWeight: '700',
     color: COLORS.text,
   },
@@ -190,7 +193,13 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   stageCard: {
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: ACCESSIBILITY.borderRadius.lg,
     padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.md,
+    gap: SPACING.sm,
   },
   instructionText: {
     fontSize: ACCESSIBILITY.fontSize.body,
@@ -201,9 +210,7 @@ const styles = StyleSheet.create({
   },
   objectsGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: SPACING.sm,
-    marginBottom: SPACING.lg,
     justifyContent: 'space-between',
   },
   objectBox: {
@@ -216,11 +223,11 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   objectEmoji: {
-    fontSize: 40,
-    marginBottom: 4,
+    fontSize: 38,
+    marginBottom: 6,
   },
   objectName: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
     textAlign: 'center',
     color: COLORS.text,
@@ -232,7 +239,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   questionText: {
-    fontSize: ACCESSIBILITY.fontSize.heading,
+    fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '700',
     color: COLORS.text,
     marginBottom: SPACING.sm,
@@ -245,7 +252,7 @@ const styles = StyleSheet.create({
     lineHeight: ACCESSIBILITY.lineHeight.body,
   },
   optionsList: {
-    gap: SPACING.md,
+    gap: SPACING.xs,
   },
   optionButton: {
     minHeight: ACCESSIBILITY.minTouchTargetHeight,
@@ -259,14 +266,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   optionText: {
-    fontSize: ACCESSIBILITY.fontSize.body,
+    fontSize: ACCESSIBILITY.fontSize.body - 2,
     fontWeight: '700',
     color: COLORS.text,
     flex: 1,
   },
-  feedbackHeader: {
+  feedbackCenter: {
     alignItems: 'center',
-    marginBottom: SPACING.md,
+    gap: SPACING.xs,
+  },
+  feedbackEmoji: {
+    fontSize: 52,
   },
   feedbackTitle: {
     fontSize: ACCESSIBILITY.fontSize.heading,
@@ -278,7 +288,6 @@ const styles = StyleSheet.create({
     fontSize: ACCESSIBILITY.fontSize.body,
     color: COLORS.text,
     textAlign: 'center',
-    marginBottom: SPACING.lg,
-    lineHeight: ACCESSIBILITY.lineHeight.body,
+    lineHeight: ACCESSIBILITY.lineHeight.caption,
   },
 });
