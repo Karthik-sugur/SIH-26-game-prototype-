@@ -10,7 +10,7 @@ import { useLanguage } from '../i18n/LanguageContext';
 import { RoleHeader } from '../components/common/RoleHeader';
 import { RoleSelectionScreen } from '../screens/RoleSelectionScreen';
 import { PatientHomeScreen } from '../screens/patient/PatientHomeScreen';
-import { GameSessionScreen } from '../screens/patient/GameSessionScreen';
+import { KoriFlowScreen } from '../screens/kori/KoriFlowScreen';
 import { PatientRemindersScreen } from '../screens/patient/PatientRemindersScreen';
 import { PatientProfileScreen } from '../screens/patient/PatientProfileScreen';
 
@@ -18,17 +18,12 @@ import { CaregiverDashboardScreen } from '../screens/caregiver/CaregiverDashboar
 import { PatientDetailScreen } from '../screens/caregiver/PatientDetailScreen';
 import { CaregiverRemindersScreen } from '../screens/caregiver/CaregiverRemindersScreen';
 import { EscalationAlertScreen } from '../screens/caregiver/EscalationAlertScreen';
+import { MemoryProfileScreen } from '../screens/caregiver/MemoryProfileScreen';
 
 const PatientTab = createBottomTabNavigator();
 const CaregiverTab = createBottomTabNavigator();
 
-export function PatientNavigator({
-  onNavigateGame,
-  onNavigateReminders,
-}: {
-  onNavigateGame: () => void;
-  onNavigateReminders: () => void;
-}) {
+export function PatientNavigator() {
   const { t } = useLanguage();
 
   return (
@@ -48,19 +43,19 @@ export function PatientNavigator({
           tabBarIcon: ({ color }) => <Ionicons name="home" size={26} color={color} />,
         }}
       >
-        {() => (
+        {({ navigation }) => (
           <PatientHomeScreen
-            onStartActivity={onNavigateGame}
-            onViewReminders={onNavigateReminders}
+            onStartActivity={() => navigation.navigate('KoriFlow')}
+            onViewReminders={() => navigation.navigate('PatientReminders')}
           />
         )}
       </PatientTab.Screen>
 
       <PatientTab.Screen
-        name="GameSession"
-        component={GameSessionScreen}
+        name="KoriFlow"
+        component={KoriFlowScreen}
         options={{
-          title: t('tabActivity'),
+          title: t('tabKori'),
           tabBarIcon: ({ color }) => <Ionicons name="flower" size={26} color={color} />,
         }}
       />
@@ -86,13 +81,7 @@ export function PatientNavigator({
   );
 }
 
-export function CaregiverNavigator({
-  onNavigateDetail,
-  onNavigateEscalation,
-}: {
-  onNavigateDetail: () => void;
-  onNavigateEscalation: () => void;
-}) {
+export function CaregiverNavigator() {
   const { t } = useLanguage();
 
   return (
@@ -112,13 +101,22 @@ export function CaregiverNavigator({
           tabBarIcon: ({ color }) => <Ionicons name="grid" size={24} color={color} />,
         }}
       >
-        {() => (
+        {({ navigation }) => (
           <CaregiverDashboardScreen
-            onNavigateDetail={onNavigateDetail}
-            onNavigateEscalation={onNavigateEscalation}
+            onNavigateDetail={() => navigation.navigate('PatientDetail')}
+            onNavigateEscalation={() => navigation.navigate('EscalationAlerts')}
           />
         )}
       </CaregiverTab.Screen>
+
+      <CaregiverTab.Screen
+        name="MemoryProfile"
+        component={MemoryProfileScreen}
+        options={{
+          title: t('tabMemory'),
+          tabBarIcon: ({ color }) => <Ionicons name="heart" size={24} color={color} />,
+        }}
+      />
 
       <CaregiverTab.Screen
         name="PatientDetail"
@@ -166,11 +164,7 @@ export function AppNavigator() {
       <RoleHeader currentRole={currentRole} onSwitchRole={(role) => setCurrentRole(role)} />
       <View style={styles.contentContainer}>
         <NavigationContainer>
-          {currentRole === 'patient' ? (
-            <PatientNavigator onNavigateGame={() => {}} onNavigateReminders={() => {}} />
-          ) : (
-            <CaregiverNavigator onNavigateDetail={() => {}} onNavigateEscalation={() => {}} />
-          )}
+          {currentRole === 'patient' ? <PatientNavigator /> : <CaregiverNavigator />}
         </NavigationContainer>
       </View>
     </View>

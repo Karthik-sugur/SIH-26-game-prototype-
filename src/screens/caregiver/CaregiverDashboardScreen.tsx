@@ -5,6 +5,7 @@ import { useCaregiverData } from '../../services/useCaregiverData';
 import { CognitiveDomainScore } from '../../types';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useKoriSession } from '../../kori/engine/KoriSessionContext';
 
 const TREND_CFG = {
   improving: { icon: 'trending-up' as const, color: COLORS.primaryGreen, bg: COLORS.successLight },
@@ -74,7 +75,12 @@ export const CaregiverDashboardScreen: React.FC<CaregiverDashboardScreenProps> =
   onNavigateDetail,
   onNavigateEscalation,
 }) => {
+<<<<<<< HEAD
+  const { weeklySummary, domainScores, alerts, trendLabel } = useCaregiverData();
+  const { lastInsight } = useKoriSession();
+=======
   const { weeklySummary, domainScores, alerts } = useCaregiverData();
+>>>>>>> refs/remotes/sih-main
   const { t } = useLanguage();
   const activeAlertCount = alerts.filter((a) => !a.resolved).length;
 
@@ -91,7 +97,36 @@ export const CaregiverDashboardScreen: React.FC<CaregiverDashboardScreenProps> =
         </TouchableOpacity>
       </View>
 
+<<<<<<< HEAD
+      <Card bgColor={COLORS.primarySoft} borderColor={COLORS.border} style={styles.koriInsight}>
+        <Text style={styles.koriInsightTitle}>{t('koriInsightTitle')}</Text>
+        {lastInsight ? (
+          <>
+            <Text style={styles.koriLine}>
+              <Text style={styles.koriKey}>{t('koriInsightMemory')}: </Text>
+              {lastInsight.memoryStatus === 'stable' ? t('koriStable') : t('koriNeedsSupport')}
+            </Text>
+            <Text style={styles.koriLine}>
+              <Text style={styles.koriKey}>{t('koriInsightRoutine')}: </Text>
+              {lastInsight.routineNote}
+            </Text>
+            <Text style={styles.koriLine}>
+              <Text style={styles.koriKey}>{t('koriInsightDelayed')}: </Text>
+              {lastInsight.delayedNote}
+            </Text>
+            <Text style={[styles.koriLine, { marginTop: 8 }]}>
+              <Text style={styles.koriKey}>{t('koriInsightRec')}: </Text>
+              {lastInsight.recommendation}
+            </Text>
+          </>
+        ) : (
+          <Text style={styles.koriEmpty}>{t('koriInsightEmpty')}</Text>
+        )}
+      </Card>
+
+=======
       {/* Flagged Concern Banner */}
+>>>>>>> refs/remotes/sih-main
       {weeklySummary.flaggedConcern && (
         <TouchableOpacity onPress={onNavigateEscalation} activeOpacity={0.85} style={styles.concernBanner}>
           <View style={styles.concernIconWrap}>
@@ -141,7 +176,36 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     gap: SPACING.md,
   },
+<<<<<<< HEAD
+  koriInsight: {
+    marginBottom: SPACING.md,
+    padding: SPACING.md,
+  },
+  koriInsightTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: COLORS.text,
+    marginBottom: SPACING.sm,
+  },
+  koriLine: {
+    fontSize: 15,
+    color: COLORS.text,
+    lineHeight: 22,
+    marginBottom: 4,
+  },
+  koriKey: {
+    fontWeight: '800',
+    color: COLORS.primary,
+  },
+  koriEmpty: {
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    lineHeight: 22,
+  },
+  header: {
+=======
   topBar: {
+>>>>>>> refs/remotes/sih-main
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

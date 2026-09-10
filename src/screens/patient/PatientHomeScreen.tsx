@@ -35,11 +35,30 @@ export const PatientHomeScreen: React.FC<PatientHomeScreenProps> = ({
         </View>
       </View>
 
+<<<<<<< HEAD
+      <Card bgColor={COLORS.primarySoft} borderColor={COLORS.border} style={styles.koriCard}>
+        <Text style={styles.shells}>🐚 🐚 🐚</Text>
+        <Text style={styles.koriTitle}>{t('koriGreeting')}</Text>
+        <Text style={styles.activityDescription}>{t('koriHomeDesc')}</Text>
+        <AccessibleButton
+          title={t('koriHomeCta')}
+          onPress={onStartActivity}
+          variant="primary"
+          iconName="play-circle"
+        />
+      </Card>
+
+      <Card bgColor={COLORS.tileSand} borderColor={COLORS.border} style={styles.streakCard}>
+        <View style={styles.streakRow}>
+          <View style={styles.starCircle}>
+            <Ionicons name="sunny-outline" size={28} color={COLORS.accent} />
+=======
       {/* Streak Card */}
       <View style={[styles.streakCard]}>
         <View style={styles.streakLeft}>
           <View style={styles.streakIconWrap}>
             <Ionicons name="flame" size={24} color={COLORS.warmOrange} />
+>>>>>>> refs/remotes/sih-main
           </View>
           <View>
             <Text style={styles.streakNumber}>{patient.streakDays}</Text>
@@ -65,10 +84,8 @@ export const PatientHomeScreen: React.FC<PatientHomeScreenProps> = ({
           </View>
           <AudioNarrationButton textToNarrate={nextReminder.audioNarrationText} label="Listen" />
         </View>
-
         <Text style={styles.cueQuestion}>"{nextReminder.questionPrompt}"</Text>
         <Text style={styles.cueSubtitle}>{nextReminder.subtitle}</Text>
-
         <AccessibleButton
           title="View Today's Cues"
           onPress={onViewReminders}
@@ -76,6 +93,8 @@ export const PatientHomeScreen: React.FC<PatientHomeScreenProps> = ({
           iconName="list"
         />
       </Card>
+<<<<<<< HEAD
+=======
 
       {/* Activity Card */}
       <View style={styles.activityCard}>
@@ -94,6 +113,7 @@ export const PatientHomeScreen: React.FC<PatientHomeScreenProps> = ({
           size="normal"
         />
       </View>
+>>>>>>> refs/remotes/sih-main
     </ScrollView>
   );
 };
@@ -103,6 +123,46 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     backgroundColor: COLORS.bgLight,
     flexGrow: 1,
+<<<<<<< HEAD
+  },
+  greetingHeader: {
+    marginBottom: SPACING.md,
+  },
+  namasteText: {
+    fontSize: ACCESSIBILITY.fontSize.title,
+    fontWeight: '800',
+    color: COLORS.text,
+  },
+  subGreeting: {
+    fontSize: ACCESSIBILITY.fontSize.body,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+    lineHeight: ACCESSIBILITY.lineHeight.body,
+  },
+  koriCard: {
+    padding: SPACING.lg,
+    marginBottom: SPACING.md,
+    alignItems: 'center',
+  },
+  shells: {
+    fontSize: 28,
+    marginBottom: SPACING.xs,
+  },
+  koriTitle: {
+    fontSize: ACCESSIBILITY.fontSize.heading,
+    fontWeight: '800',
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: SPACING.xs,
+  },
+  streakCard: {
+    marginBottom: SPACING.md,
+  },
+  streakRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+=======
+>>>>>>> refs/remotes/sih-main
     gap: SPACING.md,
   },
   greetingRow: {
@@ -215,6 +275,24 @@ const styles = StyleSheet.create({
   cueQuestion: {
     fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '700',
+<<<<<<< HEAD
+    color: COLORS.text,
+    marginVertical: SPACING.xs,
+    lineHeight: ACCESSIBILITY.lineHeight.heading,
+  },
+  cueSubtitle: {
+    fontSize: ACCESSIBILITY.fontSize.body - 1,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.md,
+    lineHeight: ACCESSIBILITY.lineHeight.body,
+  },
+  activityDescription: {
+    fontSize: ACCESSIBILITY.fontSize.body - 1,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.md,
+    lineHeight: ACCESSIBILITY.lineHeight.body,
+    textAlign: 'center',
+=======
     color: COLORS.textDark,
     lineHeight: ACCESSIBILITY.lineHeight.heading - 2,
     marginBottom: SPACING.xs,
@@ -253,5 +331,6 @@ const styles = StyleSheet.create({
     fontSize: ACCESSIBILITY.fontSize.micro,
     color: 'rgba(255,255,255,0.8)',
     lineHeight: 17,
+>>>>>>> refs/remotes/sih-main
   },
 });
