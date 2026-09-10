@@ -1,65 +1,76 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { COLORS, SPACING, ACCESSIBILITY } from '../../theme/tokens';
 import { Card } from '../../components/common/Card';
 import { AccessibleButton } from '../../components/common/AccessibleButton';
 import { useReminders } from '../../services/useReminders';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export const CaregiverRemindersScreen: React.FC = () => {
-  const { reminders, addReminder } = useReminders();
+  const { reminders, addReminder, categoryLabel } = useReminders();
+  const { t } = useLanguage();
   const [showAddForm, setShowAddForm] = useState(false);
   const [time, setTime] = useState('02:00 PM');
-  const [question, setQuestion] = useState('Have you taken your afternoon herbal tea?');
-  const [subtitle, setSubtitle] = useState('Warm drink cue');
+  const [question, setQuestion] = useState('');
+  const [subtitle, setSubtitle] = useState('');
+  const questionValue = question || t('defaultNewQuestion');
+  const subtitleValue = subtitle || t('defaultNewSubtitle');
 
   const handleCreate = () => {
     addReminder({
       time,
       category: 'hydration',
-      questionPrompt: question,
-      subtitle,
-      audioNarrationText: question,
+      questionPrompt: questionValue,
+      subtitle: subtitleValue,
+      audioNarrationText: questionValue,
     });
     setShowAddForm(false);
+    setQuestion('');
+    setSubtitle('');
   };
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title}>Reminders Management</Text>
-          <Text style={styles.subtitle}>Configure cued-recall prompts for Ramesh</Text>
+          <Text style={styles.title}>{t('remindersMgmt')}</Text>
+          <Text style={styles.subtitle}>{t('configureFor', { name: 'Ramesh' })}</Text>
         </View>
         <AccessibleButton
-          title={showAddForm ? 'Close' : '+ Add Prompt'}
+          title={showAddForm ? t('close') : t('addPrompt')}
           onPress={() => setShowAddForm(!showAddForm)}
           variant="secondary"
-          style={{ minHeight: 44, paddingHorizontal: 12 }}
+          style={{ minHeight: 48, paddingHorizontal: 12 }}
         />
       </View>
 
-      {/* Add Reminder Form */}
       {showAddForm && (
-        <Card bgColor={COLORS.white} borderColor={COLORS.skyBlue} style={styles.formCard}>
-          <Text style={styles.formTitle}>New Cued Reminder Prompt</Text>
+        <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.formCard}>
+          <Text style={styles.formTitle}>{t('newPrompt')}</Text>
 
-          <Text style={styles.label}>Scheduled Time</Text>
+          <Text style={styles.label}>{t('scheduledTime')}</Text>
           <TextInput style={styles.input} value={time} onChangeText={setTime} />
 
-          <Text style={styles.label}>Question Prompt (Gentle Cued Recall)</Text>
+          <Text style={styles.label}>{t('questionPrompt')}</Text>
           <TextInput
             style={styles.input}
             value={question}
+            placeholder={t('defaultNewQuestion')}
             onChangeText={setQuestion}
             multiline
           />
 
-          <Text style={styles.label}>Subtitle / Context</Text>
-          <TextInput style={styles.input} value={subtitle} onChangeText={setSubtitle} />
+          <Text style={styles.label}>{t('subtitleContext')}</Text>
+          <TextInput
+            style={styles.input}
+            value={subtitle}
+            placeholder={t('defaultNewSubtitle')}
+            onChangeText={setSubtitle}
+          />
 
           <AccessibleButton
-            title="Save Cued Reminder"
+            title={t('saveReminder')}
             onPress={handleCreate}
             variant="primary"
             iconName="save-outline"
@@ -67,17 +78,16 @@ export const CaregiverRemindersScreen: React.FC = () => {
         </Card>
       )}
 
-      {/* Schedule List */}
-      <Text style={styles.sectionTitle}>Active Daily Schedule</Text>
+      <Text style={styles.sectionTitle}>{t('activeSchedule')}</Text>
 
       {reminders.map((item) => (
-        <Card key={item.id} bgColor={COLORS.white} borderColor={COLORS.border} style={styles.itemCard}>
+        <Card key={item.id} bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.itemCard}>
           <View style={styles.itemHeader}>
             <View style={styles.timeTag}>
-              <Ionicons name="time" size={16} color={COLORS.skyBlue} />
+              <Ionicons name="time" size={16} color={COLORS.info} />
               <Text style={styles.timeText}>{item.time}</Text>
             </View>
-            <Text style={styles.categoryText}>{item.category}</Text>
+            <Text style={styles.categoryText}>{categoryLabel(item.category)}</Text>
           </View>
 
           <Text style={styles.promptText}>{item.questionPrompt}</Text>
@@ -91,7 +101,7 @@ export const CaregiverRemindersScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.md,
-    backgroundColor: COLORS.bgLight,
+    backgroundColor: COLORS.bg,
     flexGrow: 1,
   },
   header: {
@@ -99,15 +109,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: SPACING.md,
+    gap: SPACING.sm,
   },
   title: {
     fontSize: 22,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   subtitle: {
-    fontSize: 14,
-    color: COLORS.textMuted,
+    fontSize: 15,
+    color: COLORS.textSecondary,
   },
   formCard: {
     padding: SPACING.md,
@@ -116,30 +127,30 @@ const styles = StyleSheet.create({
   formTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
     marginBottom: SPACING.xs,
   },
   label: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     marginTop: SPACING.xs,
-    textTransform: 'uppercase',
   },
   input: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surfaceMuted,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: ACCESSIBILITY.borderRadius.sm,
     padding: SPACING.sm,
-    fontSize: 15,
-    color: COLORS.textDark,
+    fontSize: 16,
+    color: COLORS.text,
     marginTop: 4,
+    minHeight: 48,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
     marginBottom: SPACING.xs,
   },
   itemCard: {
@@ -158,24 +169,24 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   timeText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '700',
-    color: COLORS.skyBlue,
+    color: COLORS.info,
   },
   categoryText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     textTransform: 'uppercase',
   },
   promptText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   subText: {
-    fontSize: 13,
-    color: COLORS.textMuted,
+    fontSize: 14,
+    color: COLORS.textSecondary,
     marginTop: 2,
   },
 });

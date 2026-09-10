@@ -5,83 +5,81 @@ import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { useCaregiverData } from '../../services/useCaregiverData';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface CaregiverDashboardScreenProps {
   onNavigateDetail: () => void;
   onNavigateEscalation: () => void;
 }
 
+const TILE_COLORS = [COLORS.tileJade, COLORS.tileRose, COLORS.tileSky, COLORS.tileSand, COLORS.primarySoft];
+
 export const CaregiverDashboardScreen: React.FC<CaregiverDashboardScreenProps> = ({
   onNavigateDetail,
   onNavigateEscalation,
 }) => {
-  const { weeklySummary, domainScores, alerts } = useCaregiverData();
+  const { weeklySummary, domainScores, alerts, trendLabel } = useCaregiverData();
+  const { t } = useLanguage();
   const activeAlertCount = alerts.filter((a) => !a.resolved).length;
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>Caregiver Dashboard</Text>
-          <Text style={styles.subtitle}>Patient: Ramesh Patel (74 yrs)</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.title}>{t('caregiverDashboard')}</Text>
+          <Text style={styles.subtitle}>
+            {t('patientLabel', { name: 'Ramesh Patel', age: 74 })}
+          </Text>
         </View>
-        <TouchableOpacity
-          style={styles.alertCountChip}
-          onPress={onNavigateEscalation}
-        >
+        <TouchableOpacity style={styles.alertCountChip} onPress={onNavigateEscalation}>
           <Ionicons name="notifications" size={20} color={COLORS.white} />
-          <Text style={styles.alertCountText}>{activeAlertCount} Alerts</Text>
+          <Text style={styles.alertCountText}>{t('alertsCount', { count: activeAlertCount })}</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Flagged Concern Banner */}
       {weeklySummary.flaggedConcern && (
-        <Card bgColor="#FEF2F2" borderColor={COLORS.error} style={styles.bannerCard}>
+        <Card bgColor={COLORS.errorBg} borderColor={COLORS.error} style={styles.bannerCard}>
           <View style={styles.bannerHeader}>
             <Ionicons name="warning" size={24} color={COLORS.error} />
             <Text style={styles.bannerTitle}>
-              Flagged Concern: {weeklySummary.flaggedConcern.title}
+              {t('flaggedConcern', { title: weeklySummary.flaggedConcern.title })}
             </Text>
           </View>
-          <Text style={styles.bannerText}>
-            {weeklySummary.flaggedConcern.recommendation}
-          </Text>
+          <Text style={styles.bannerText}>{weeklySummary.flaggedConcern.recommendation}</Text>
           <TouchableOpacity onPress={onNavigateEscalation} style={styles.bannerLink}>
-            <Text style={styles.bannerLinkText}>View Escalation Recommendation →</Text>
+            <Text style={styles.bannerLinkText}>{t('viewEscalation')} →</Text>
           </TouchableOpacity>
         </Card>
       )}
 
-      {/* What Changed This Week - Plain Language Summary */}
-      <Card bgColor={COLORS.white} borderColor={COLORS.skyBlue} style={styles.summaryCard}>
+      <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.summaryCard}>
         <View style={styles.summaryHeader}>
-          <Ionicons name="calendar-outline" size={22} color={COLORS.skyBlue} />
-          <Text style={styles.summaryTitle}>What Changed This Week</Text>
+          <Ionicons name="calendar-outline" size={22} color={COLORS.info} />
+          <Text style={styles.summaryTitle}>{t('whatChanged')}</Text>
         </View>
         <Text style={styles.headlineText}>{weeklySummary.headline}</Text>
         <Text style={styles.detailsText}>{weeklySummary.details}</Text>
       </Card>
 
-      {/* Domain Trends Overview */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Cognitive Domain Trends</Text>
+        <Text style={styles.sectionTitle}>{t('domainTrends')}</Text>
         <TouchableOpacity onPress={onNavigateDetail}>
-          <Text style={styles.seeAllText}>View Full Analysis →</Text>
+          <Text style={styles.seeAllText}>{t('viewFull')} →</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.domainsGrid}>
-        {domainScores.map((item) => (
+        {domainScores.map((item, index) => (
           <Card
             key={item.domain}
-            bgColor={COLORS.surface}
+            bgColor={TILE_COLORS[index % TILE_COLORS.length]}
             borderColor={COLORS.border}
             style={styles.domainCard}
           >
             <View style={styles.domainCardHeader}>
               <Text style={styles.domainName}>{item.domain}</Text>
               <Badge
-                label={item.trend}
+                label={trendLabel(item.trend)}
                 type={
                   item.trend === 'improving'
                     ? 'success'
@@ -93,7 +91,7 @@ export const CaregiverDashboardScreen: React.FC<CaregiverDashboardScreenProps> =
             </View>
             <View style={styles.scoreRow}>
               <Text style={styles.scoreNumber}>{item.score}</Text>
-              <Text style={styles.scoreMax}>/100</Text>
+              <Text style={styles.scoreMax}>{t('scoreOf')}</Text>
             </View>
             <Text style={styles.changeDesc}>{item.changeDescription}</Text>
           </Card>
@@ -106,7 +104,7 @@ export const CaregiverDashboardScreen: React.FC<CaregiverDashboardScreenProps> =
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.md,
-    backgroundColor: COLORS.bgLight,
+    backgroundColor: COLORS.bg,
     flexGrow: 1,
   },
   header: {
@@ -114,15 +112,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SPACING.md,
+    gap: SPACING.sm,
   },
   title: {
     fontSize: 24,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   subtitle: {
-    fontSize: 14,
-    color: COLORS.textMuted,
+    fontSize: 15,
+    color: COLORS.textSecondary,
     marginTop: 2,
   },
   alertCountChip: {
@@ -130,12 +129,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.error,
     paddingHorizontal: SPACING.sm,
-    paddingVertical: 6,
+    paddingVertical: 10,
     borderRadius: ACCESSIBILITY.borderRadius.pill,
     gap: 6,
+    minHeight: 44,
   },
   alertCountText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '700',
     color: COLORS.white,
   },
@@ -152,17 +152,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
     color: COLORS.error,
+    flex: 1,
   },
   bannerText: {
-    fontSize: 14,
-    color: COLORS.textDark,
-    lineHeight: 20,
+    fontSize: 15,
+    color: COLORS.text,
+    lineHeight: 22,
   },
   bannerLink: {
     marginTop: SPACING.xs,
   },
   bannerLinkText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
     color: COLORS.error,
   },
@@ -177,37 +178,38 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xs,
   },
   summaryTitle: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
-    color: COLORS.skyBlue,
-    textTransform: 'uppercase',
+    color: COLORS.info,
   },
   headlineText: {
     fontSize: 18,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
     marginVertical: 4,
   },
   detailsText: {
-    fontSize: 14,
-    color: COLORS.textMuted,
-    lineHeight: 20,
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    lineHeight: 22,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SPACING.xs,
+    gap: SPACING.sm,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
+    flex: 1,
   },
   seeAllText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.primaryGreen,
+    color: COLORS.primary,
   },
   domainsGrid: {
     gap: SPACING.xs,
@@ -223,7 +225,7 @@ const styles = StyleSheet.create({
   domainName: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   scoreRow: {
     flexDirection: 'row',
@@ -231,17 +233,17 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   scoreNumber: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   scoreMax: {
     fontSize: 14,
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     marginLeft: 2,
   },
   changeDesc: {
-    fontSize: 13,
-    color: COLORS.textMuted,
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
 });

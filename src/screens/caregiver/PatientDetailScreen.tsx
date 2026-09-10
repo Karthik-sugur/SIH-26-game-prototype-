@@ -5,22 +5,23 @@ import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { useCaregiverData } from '../../services/useCaregiverData';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export const PatientDetailScreen: React.FC = () => {
-  const { domainScores } = useCaregiverData();
+  const { domainScores, trendLabel } = useCaregiverData();
+  const { t } = useLanguage();
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Cognitive Domain Breakdown</Text>
-      <Text style={styles.subtitle}>Detailed analysis for Ramesh Patel</Text>
+      <Text style={styles.title}>{t('domainBreakdown')}</Text>
+      <Text style={styles.subtitle}>{t('detailedFor', { name: 'Ramesh Patel' })}</Text>
 
-      {/* Domain Scores Bar Charts */}
       {domainScores.map((item) => (
-        <Card key={item.domain} bgColor={COLORS.white} borderColor={COLORS.border} style={styles.domainDetailCard}>
+        <Card key={item.domain} bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.domainDetailCard}>
           <View style={styles.cardHeader}>
             <Text style={styles.domainName}>{item.domain}</Text>
             <Badge
-              label={item.trend}
+              label={trendLabel(item.trend)}
               type={
                 item.trend === 'improving'
                   ? 'success'
@@ -39,10 +40,10 @@ export const PatientDetailScreen: React.FC = () => {
                   width: `${item.score}%`,
                   backgroundColor:
                     item.score > 75
-                      ? COLORS.primaryGreen
+                      ? COLORS.primary
                       : item.score > 65
-                      ? COLORS.skyBlue
-                      : COLORS.warmOrange,
+                      ? COLORS.info
+                      : COLORS.accent,
                 },
               ]}
             />
@@ -55,26 +56,25 @@ export const PatientDetailScreen: React.FC = () => {
         </Card>
       ))}
 
-      {/* Recent Session Logs */}
-      <Text style={[styles.title, { marginTop: SPACING.md }]}>Recent Session History</Text>
+      <Text style={[styles.title, { marginTop: SPACING.md }]}>{t('recentHistory')}</Text>
 
-      <Card bgColor={COLORS.white} borderColor={COLORS.border} style={styles.historyCard}>
+      <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.historyCard}>
         <View style={styles.sessionRow}>
-          <Ionicons name="checkmark-circle" size={24} color={COLORS.primaryGreen} />
+          <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.sessionTitle}>Morning Object Recall (Memory)</Text>
+            <Text style={styles.sessionTitle}>{t('morningRecall')}</Text>
             <Text style={styles.sessionTime}>10 Sep 2026 • 09:15 AM</Text>
           </View>
-          <Text style={styles.sessionScore}>Score: 100%</Text>
+          <Text style={styles.sessionScore}>{t('scorePct')}</Text>
         </View>
 
         <View style={[styles.sessionRow, { marginTop: SPACING.sm }]}>
-          <Ionicons name="time" size={24} color={COLORS.warmOrange} />
+          <Ionicons name="time" size={24} color={COLORS.accent} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.sessionTitle}>Visuospatial Navigation Prompt</Text>
+            <Text style={styles.sessionTitle}>{t('visuospatialPrompt')}</Text>
             <Text style={styles.sessionTime}>09 Sep 2026 • 04:30 PM</Text>
           </View>
-          <Text style={styles.sessionScore}>Hesitation (45s)</Text>
+          <Text style={styles.sessionScore}>{t('hesitation')}</Text>
         </View>
       </Card>
     </ScrollView>
@@ -84,17 +84,17 @@ export const PatientDetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.md,
-    backgroundColor: COLORS.bgLight,
+    backgroundColor: COLORS.bg,
     flexGrow: 1,
   },
   title: {
     fontSize: 22,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   subtitle: {
-    fontSize: 14,
-    color: COLORS.textMuted,
+    fontSize: 15,
+    color: COLORS.textSecondary,
     marginBottom: SPACING.md,
   },
   domainDetailCard: {
@@ -110,33 +110,36 @@ const styles = StyleSheet.create({
   domainName: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   barContainer: {
-    height: 12,
-    backgroundColor: COLORS.surface,
-    borderRadius: 6,
+    height: 14,
+    backgroundColor: COLORS.surfaceMuted,
+    borderRadius: 8,
     overflow: 'hidden',
     marginVertical: 6,
   },
   barFill: {
     height: '100%',
-    borderRadius: 6,
+    borderRadius: 8,
   },
   scoreRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 4,
+    gap: SPACING.sm,
   },
   scoreText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   descText: {
-    fontSize: 12,
-    color: COLORS.textMuted,
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    flex: 1,
+    textAlign: 'right',
   },
   historyCard: {
     padding: SPACING.md,
@@ -148,17 +151,17 @@ const styles = StyleSheet.create({
     gap: SPACING.xs,
   },
   sessionTitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   sessionTime: {
-    fontSize: 12,
-    color: COLORS.textMuted,
+    fontSize: 13,
+    color: COLORS.textSecondary,
   },
   sessionScore: {
     fontSize: 13,
     fontWeight: '700',
-    color: COLORS.primaryGreen,
+    color: COLORS.primary,
   },
 });

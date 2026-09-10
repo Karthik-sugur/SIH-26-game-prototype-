@@ -6,7 +6,7 @@ export const MOCK_PATIENT: PatientProfile = {
   age: 74,
   location: 'Ahmedabad, Gujarat',
   photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
-  preferredLanguage: 'Gujarati / Hindi / English',
+  preferredLanguage: 'English / Assamese',
   emergencyContact: {
     name: 'Priya Patel (Daughter)',
     relation: 'Primary Caregiver',

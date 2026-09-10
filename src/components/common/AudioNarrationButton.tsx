@@ -1,28 +1,25 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { COLORS, ACCESSIBILITY } from '../../theme/tokens';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface AudioNarrationButtonProps {
   textToNarrate?: string;
   label?: string;
 }
 
-/**
- * Placeholder audio-narration button component for elderly patient instructions.
- * Visually provides audio cues; simulates TTS narration playback on tap.
- */
 export const AudioNarrationButton: React.FC<AudioNarrationButtonProps> = ({
   textToNarrate = 'Audio narration cue',
-  label = 'Listen',
+  label,
 }) => {
+  const { t } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(false);
+  const displayLabel = label ?? t('listen');
 
   const handlePress = () => {
     setIsPlaying(true);
-    setTimeout(() => {
-      setIsPlaying(false);
-    }, 2500);
+    setTimeout(() => setIsPlaying(false), 2500);
   };
 
   return (
@@ -31,16 +28,16 @@ export const AudioNarrationButton: React.FC<AudioNarrationButtonProps> = ({
       onPress={handlePress}
       style={[
         styles.container,
-        { backgroundColor: isPlaying ? COLORS.warmOrange : COLORS.lavender },
+        { backgroundColor: isPlaying ? COLORS.accentSoft : COLORS.primarySoft },
       ]}
-      accessibilityLabel={`Audio Narration: ${label}`}
+      accessibilityLabel={`Audio Narration: ${displayLabel}. ${textToNarrate}`}
     >
       <Ionicons
         name={isPlaying ? 'volume-high' : 'volume-medium-outline'}
         size={24}
-        color={COLORS.textDark}
+        color={COLORS.primary}
       />
-      <Text style={styles.text}>{isPlaying ? 'Playing...' : label}</Text>
+      <Text style={styles.text}>{isPlaying ? t('playing') : displayLabel}</Text>
     </TouchableOpacity>
   );
 };
@@ -55,10 +52,12 @@ const styles = StyleSheet.create({
     borderRadius: ACCESSIBILITY.borderRadius.pill,
     minHeight: 48,
     gap: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   text: {
     fontSize: ACCESSIBILITY.fontSize.caption,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
 });

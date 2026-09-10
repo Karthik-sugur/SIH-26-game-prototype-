@@ -7,14 +7,14 @@
     "userInterfaceStyle": "light",
     "splash": {
       "resizeMode": "contain",
-      "backgroundColor": "#FAFAFC"
+      "backgroundColor": "#F5F4F0"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#FAFAFC"
+        "backgroundColor": "#F5F4F0"
       }
     },
     "web": {

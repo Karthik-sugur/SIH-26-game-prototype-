@@ -7,6 +7,7 @@ import { AudioNarrationButton } from '../../components/common/AudioNarrationButt
 import { usePatientData } from '../../services/usePatientData';
 import { useReminders } from '../../services/useReminders';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface PatientHomeScreenProps {
   onStartActivity: () => void;
@@ -19,63 +20,56 @@ export const PatientHomeScreen: React.FC<PatientHomeScreenProps> = ({
 }) => {
   const { patient } = usePatientData();
   const { reminders } = useReminders();
+  const { t } = useLanguage();
 
   const nextReminder = reminders.find((r) => !r.completedToday) || reminders[0];
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      {/* Greeting Banner */}
       <View style={styles.greetingHeader}>
-        <Text style={styles.namasteText}>नमस्ते, {patient.name} ji 🙏</Text>
-        <Text style={styles.subGreeting}>Wishing you a calm and pleasant day.</Text>
+        <Text style={styles.namasteText}>{t('greeting', { name: patient.name })}</Text>
+        <Text style={styles.subGreeting}>{t('calmDay')}</Text>
       </View>
 
-      {/* Gentle Non-Punitive Streak Card */}
-      <Card bgColor={COLORS.softYellow} borderColor="#F59E0B" style={styles.streakCard}>
+      <Card bgColor={COLORS.tileSand} borderColor={COLORS.border} style={styles.streakCard}>
         <View style={styles.streakRow}>
           <View style={styles.starCircle}>
-            <Ionicons name="sparkles" size={28} color={COLORS.warmOrange} />
+            <Ionicons name="sunny-outline" size={28} color={COLORS.accent} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.streakTitle}>
-              {patient.streakDays} Days of Memory Practice!
+              {t('streakTitle', { days: patient.streakDays })}
             </Text>
-            <Text style={styles.streakSubtitle}>
-              Every gentle effort helps keep your mind warm and active.
-            </Text>
+            <Text style={styles.streakSubtitle}>{t('streakSubtitle')}</Text>
           </View>
         </View>
       </Card>
 
-      {/* Primary Cued-Recall Card */}
-      <Card bgColor={COLORS.white} borderColor={COLORS.skyBlue} style={styles.cueCard}>
+      <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.cueCard}>
         <View style={styles.cueHeaderRow}>
-          <Text style={styles.cueCategoryTag}>Today's Cued Memory</Text>
-          <AudioNarrationButton textToNarrate={nextReminder.audioNarrationText} label="Listen" />
+          <Text style={styles.cueCategoryTag}>{t('todaysCue')}</Text>
+          <AudioNarrationButton textToNarrate={nextReminder.audioNarrationText} />
         </View>
 
         <Text style={styles.cueQuestion}>"{nextReminder.questionPrompt}"</Text>
         <Text style={styles.cueSubtitle}>{nextReminder.subtitle}</Text>
 
         <AccessibleButton
-          title="Check Today's Cues"
+          title={t('checkCues')}
           onPress={onViewReminders}
           variant="secondary"
           iconName="help-circle-outline"
         />
       </Card>
 
-      {/* Start Today's Activity Action */}
-      <Card bgColor={COLORS.white} borderColor={COLORS.primaryGreen} style={styles.activityCard}>
+      <Card bgColor={COLORS.primarySoft} borderColor={COLORS.border} style={styles.activityCard}>
         <View style={styles.activityHeaderRow}>
-          <Ionicons name="game-controller-outline" size={32} color={COLORS.primaryGreen} />
-          <Text style={styles.activityTitle}>Today's Memory Activity</Text>
+          <Ionicons name="flower-outline" size={32} color={COLORS.primary} />
+          <Text style={styles.activityTitle}>{t('todaysActivity')}</Text>
         </View>
-        <Text style={styles.activityDescription}>
-          Enjoy a gentle 3-minute object recall activity to keep your memory sharp.
-        </Text>
+        <Text style={styles.activityDescription}>{t('activityDesc')}</Text>
         <AccessibleButton
-          title="Start Today's Activity"
+          title={t('startActivity')}
           onPress={onStartActivity}
           variant="primary"
           iconName="play-circle"
@@ -88,7 +82,7 @@ export const PatientHomeScreen: React.FC<PatientHomeScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.md,
-    backgroundColor: COLORS.bgLight,
+    backgroundColor: COLORS.bg,
     flexGrow: 1,
   },
   greetingHeader: {
@@ -97,12 +91,13 @@ const styles = StyleSheet.create({
   namasteText: {
     fontSize: ACCESSIBILITY.fontSize.title,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   subGreeting: {
     fontSize: ACCESSIBILITY.fontSize.body,
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     marginTop: 4,
+    lineHeight: ACCESSIBILITY.lineHeight.body,
   },
   streakCard: {
     marginBottom: SPACING.md,
@@ -113,22 +108,23 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
   },
   starCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: COLORS.white,
+    width: 52,
+    height: 52,
+    borderRadius: 18,
+    backgroundColor: COLORS.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   streakTitle: {
     fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   streakSubtitle: {
     fontSize: ACCESSIBILITY.fontSize.caption,
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     marginTop: 2,
+    lineHeight: ACCESSIBILITY.lineHeight.caption,
   },
   cueCard: {
     marginBottom: SPACING.md,
@@ -139,24 +135,26 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SPACING.sm,
+    gap: SPACING.sm,
+    flexWrap: 'wrap',
   },
   cueCategoryTag: {
     fontSize: ACCESSIBILITY.fontSize.caption,
     fontWeight: '700',
-    color: COLORS.skyBlue,
-    textTransform: 'uppercase',
+    color: COLORS.primary,
   },
   cueQuestion: {
     fontSize: ACCESSIBILITY.fontSize.heading,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: COLORS.text,
     marginVertical: SPACING.xs,
     lineHeight: ACCESSIBILITY.lineHeight.heading,
   },
   cueSubtitle: {
-    fontSize: ACCESSIBILITY.fontSize.body - 2,
-    color: COLORS.textMuted,
+    fontSize: ACCESSIBILITY.fontSize.body - 1,
+    color: COLORS.textSecondary,
     marginBottom: SPACING.md,
+    lineHeight: ACCESSIBILITY.lineHeight.body,
   },
   activityCard: {
     padding: SPACING.lg,
@@ -170,11 +168,12 @@ const styles = StyleSheet.create({
   activityTitle: {
     fontSize: ACCESSIBILITY.fontSize.heading,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: COLORS.text,
+    flex: 1,
   },
   activityDescription: {
-    fontSize: ACCESSIBILITY.fontSize.body - 2,
-    color: COLORS.textMuted,
+    fontSize: ACCESSIBILITY.fontSize.body - 1,
+    color: COLORS.textSecondary,
     marginBottom: SPACING.md,
     lineHeight: ACCESSIBILITY.lineHeight.body,
   },

@@ -6,21 +6,21 @@ import { AccessibleButton } from '../../components/common/AccessibleButton';
 import { Badge } from '../../components/common/Badge';
 import { useCaregiverData } from '../../services/useCaregiverData';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export const EscalationAlertScreen: React.FC = () => {
   const { alerts, resolveAlert } = useCaregiverData();
+  const { t } = useLanguage();
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Clinician & ARDSI Escalation Alerts</Text>
-      <Text style={styles.subtitle}>
-        Suggested medical / community support escalations based on cognitive metrics
-      </Text>
+      <Text style={styles.title}>{t('escalationTitle')}</Text>
+      <Text style={styles.subtitle}>{t('escalationSub')}</Text>
 
       {alerts.map((alert) => (
         <Card
           key={alert.id}
-          bgColor={alert.resolved ? COLORS.surface : '#FEF2F2'}
+          bgColor={alert.resolved ? COLORS.surfaceMuted : COLORS.errorBg}
           borderColor={alert.resolved ? COLORS.border : COLORS.error}
           style={styles.alertCard}
         >
@@ -29,37 +29,39 @@ export const EscalationAlertScreen: React.FC = () => {
               <Ionicons
                 name={alert.resolved ? 'checkmark-circle' : 'warning'}
                 size={24}
-                color={alert.resolved ? COLORS.primaryGreen : COLORS.error}
+                color={alert.resolved ? COLORS.primary : COLORS.error}
               />
               <Text style={styles.alertTitle}>{alert.title}</Text>
             </View>
             <Badge
-              label={alert.resolved ? 'Resolved' : 'Action Required'}
+              label={alert.resolved ? t('resolved') : t('actionRequired')}
               type={alert.resolved ? 'success' : 'error'}
             />
           </View>
 
-          <Text style={styles.dateText}>Observed Date: {alert.date}</Text>
+          <Text style={styles.dateText}>{t('observedDate', { date: alert.date })}</Text>
 
           <View style={styles.sectionBox}>
-            <Text style={styles.label}>Reason for Escalation Recommendation:</Text>
+            <Text style={styles.label}>{t('reasonLabel')}</Text>
             <Text style={styles.valueText}>{alert.reason}</Text>
           </View>
 
           <View style={styles.sectionBox}>
-            <Text style={styles.label}>Suggested Next Step:</Text>
+            <Text style={styles.label}>{t('nextStepLabel')}</Text>
             <Text style={styles.valueText}>{alert.suggestedAction}</Text>
           </View>
 
           <View style={styles.contactTargetBox}>
-            <Ionicons name="call-outline" size={20} color={COLORS.skyBlue} />
-            <Text style={styles.targetText}>Recommended Target: {alert.contactTarget}</Text>
+            <Ionicons name="call-outline" size={20} color={COLORS.info} />
+            <Text style={styles.targetText}>
+              {t('recommendedTarget', { target: alert.contactTarget })}
+            </Text>
           </View>
 
           {!alert.resolved && (
             <View style={styles.buttonRow}>
               <AccessibleButton
-                title={`Notify ${alert.contactTarget}`}
+                title={t('notify', { target: alert.contactTarget })}
                 onPress={() => resolveAlert(alert.id)}
                 variant="warning"
                 iconName="send"
@@ -70,16 +72,13 @@ export const EscalationAlertScreen: React.FC = () => {
         </Card>
       ))}
 
-      {/* ARDSI Helpline Information Card */}
-      <Card bgColor={COLORS.white} borderColor={COLORS.primaryGreen} style={styles.ardsiCard}>
+      <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.ardsiCard}>
         <View style={styles.ardsiHeader}>
-          <Ionicons name="medical-outline" size={28} color={COLORS.primaryGreen} />
-          <Text style={styles.ardsiTitle}>ARDSI India Support Helpline</Text>
+          <Ionicons name="medical-outline" size={28} color={COLORS.primary} />
+          <Text style={styles.ardsiTitle}>{t('ardsiTitle')}</Text>
         </View>
-        <Text style={styles.ardsiDesc}>
-          Alzheimer's and Related Disorders Society of India (ARDSI) provides national guidance, caregiver training, and dementia support groups.
-        </Text>
-        <Text style={styles.ardsiPhone}>National Helpline: +91 98461 54400</Text>
+        <Text style={styles.ardsiDesc}>{t('ardsiDesc')}</Text>
+        <Text style={styles.ardsiPhone}>{t('ardsiPhone')}</Text>
       </Card>
     </ScrollView>
   );
@@ -88,18 +87,19 @@ export const EscalationAlertScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.md,
-    backgroundColor: COLORS.bgLight,
+    backgroundColor: COLORS.bg,
     flexGrow: 1,
   },
   title: {
     fontSize: 22,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   subtitle: {
-    fontSize: 14,
-    color: COLORS.textMuted,
+    fontSize: 15,
+    color: COLORS.textSecondary,
     marginBottom: SPACING.md,
+    lineHeight: 22,
   },
   alertCard: {
     padding: SPACING.md,
@@ -110,6 +110,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 4,
+    gap: SPACING.xs,
+    flexWrap: 'wrap',
   },
   titleRow: {
     flexDirection: 'row',
@@ -120,41 +122,42 @@ const styles = StyleSheet.create({
   alertTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
+    flex: 1,
   },
   dateText: {
-    fontSize: 12,
-    color: COLORS.textMuted,
+    fontSize: 13,
+    color: COLORS.textSecondary,
     marginBottom: SPACING.xs,
   },
   sectionBox: {
     marginVertical: 4,
   },
   label: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
-    color: COLORS.textMuted,
-    textTransform: 'uppercase',
+    color: COLORS.textSecondary,
   },
   valueText: {
-    fontSize: 14,
-    color: COLORS.textDark,
+    fontSize: 15,
+    color: COLORS.text,
     marginTop: 2,
-    lineHeight: 20,
+    lineHeight: 22,
   },
   contactTargetBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#DBEAFE',
-    padding: SPACING.xs,
+    backgroundColor: COLORS.infoBg,
+    padding: SPACING.sm,
     borderRadius: ACCESSIBILITY.borderRadius.sm,
     marginVertical: SPACING.xs,
     gap: 6,
   },
   targetText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '700',
-    color: COLORS.skyBlue,
+    color: COLORS.info,
+    flex: 1,
   },
   buttonRow: {
     marginTop: SPACING.xs,
@@ -172,17 +175,18 @@ const styles = StyleSheet.create({
   ardsiTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: COLORS.primaryGreen,
+    color: COLORS.primary,
+    flex: 1,
   },
   ardsiDesc: {
-    fontSize: 13,
-    color: COLORS.textMuted,
-    lineHeight: 18,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    lineHeight: 20,
   },
   ardsiPhone: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '800',
-    color: COLORS.primaryGreen,
+    color: COLORS.primary,
     marginTop: 8,
   },
 });

@@ -5,30 +5,30 @@ import { Card } from '../../components/common/Card';
 import { AudioNarrationButton } from '../../components/common/AudioNarrationButton';
 import { useReminders } from '../../services/useReminders';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export const PatientRemindersScreen: React.FC = () => {
   const { reminders, toggleReminderComplete } = useReminders();
+  const { t } = useLanguage();
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      <Text style={styles.heading}>Today's Gentle Cues</Text>
-      <Text style={styles.subheading}>
-        Simple reminders presented as warm questions, not alarms.
-      </Text>
+      <Text style={styles.heading}>{t('cuesHeading')}</Text>
+      <Text style={styles.subheading}>{t('cuesSubheading')}</Text>
 
       {reminders.map((item) => (
         <Card
           key={item.id}
-          bgColor={item.completedToday ? COLORS.mintGreen : COLORS.white}
-          borderColor={item.completedToday ? COLORS.primaryGreen : COLORS.border}
+          bgColor={item.completedToday ? COLORS.successBg : COLORS.surface}
+          borderColor={item.completedToday ? COLORS.primary : COLORS.border}
           style={styles.reminderCard}
         >
           <View style={styles.timeCategoryRow}>
             <View style={styles.timeBadge}>
-              <Ionicons name="time-outline" size={16} color={COLORS.textDark} />
+              <Ionicons name="time-outline" size={18} color={COLORS.text} />
               <Text style={styles.timeText}>{item.time}</Text>
             </View>
-            <AudioNarrationButton textToNarrate={item.audioNarrationText} label="Listen" />
+            <AudioNarrationButton textToNarrate={item.audioNarrationText} />
           </View>
 
           <Text style={styles.questionText}>"{item.questionPrompt}"</Text>
@@ -40,25 +40,23 @@ export const PatientRemindersScreen: React.FC = () => {
             style={[
               styles.checkButton,
               {
-                backgroundColor: item.completedToday
-                  ? COLORS.primaryGreen
-                  : COLORS.surface,
-                borderColor: item.completedToday ? COLORS.primaryGreen : COLORS.skyBlue,
+                backgroundColor: item.completedToday ? COLORS.primary : COLORS.surfaceMuted,
+                borderColor: item.completedToday ? COLORS.primary : COLORS.info,
               },
             ]}
           >
             <Ionicons
               name={item.completedToday ? 'checkmark-circle' : 'ellipse-outline'}
               size={28}
-              color={item.completedToday ? COLORS.white : COLORS.skyBlue}
+              color={item.completedToday ? COLORS.white : COLORS.info}
             />
             <Text
               style={[
                 styles.checkButtonText,
-                { color: item.completedToday ? COLORS.white : COLORS.textDark },
+                { color: item.completedToday ? COLORS.white : COLORS.text },
               ]}
             >
-              {item.completedToday ? 'Done Today ✓' : 'Tap to confirm answer'}
+              {item.completedToday ? t('doneToday') : t('tapConfirm')}
             </Text>
           </TouchableOpacity>
         </Card>
@@ -70,18 +68,19 @@ export const PatientRemindersScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.md,
-    backgroundColor: COLORS.bgLight,
+    backgroundColor: COLORS.bg,
     flexGrow: 1,
   },
   heading: {
     fontSize: ACCESSIBILITY.fontSize.title,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   subheading: {
-    fontSize: ACCESSIBILITY.fontSize.body - 2,
-    color: COLORS.textMuted,
+    fontSize: ACCESSIBILITY.fontSize.body - 1,
+    color: COLORS.textSecondary,
     marginBottom: SPACING.md,
+    lineHeight: ACCESSIBILITY.lineHeight.body,
   },
   reminderCard: {
     padding: SPACING.lg,
@@ -92,35 +91,37 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SPACING.sm,
+    gap: SPACING.sm,
+    flexWrap: 'wrap',
   },
   timeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surfaceMuted,
     paddingHorizontal: SPACING.sm,
-    paddingVertical: 4,
+    paddingVertical: 8,
     borderRadius: ACCESSIBILITY.borderRadius.sm,
-    gap: 4,
+    gap: 6,
   },
   timeText: {
     fontSize: ACCESSIBILITY.fontSize.caption,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   questionText: {
     fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: COLORS.text,
     marginVertical: SPACING.xs,
     lineHeight: ACCESSIBILITY.lineHeight.heading - 2,
   },
   subtitleText: {
-    fontSize: ACCESSIBILITY.fontSize.body - 2,
-    color: COLORS.textMuted,
+    fontSize: ACCESSIBILITY.fontSize.body - 1,
+    color: COLORS.textSecondary,
     marginBottom: SPACING.md,
   },
   checkButton: {
-    minHeight: ACCESSIBILITY.minTouchTargetHeight, // 56px minimum height
+    minHeight: ACCESSIBILITY.minTouchTargetHeight,
     borderRadius: ACCESSIBILITY.borderRadius.md,
     borderWidth: 2,
     flexDirection: 'row',

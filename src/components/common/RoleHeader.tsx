@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS, SPACING, ACCESSIBILITY } from '../../theme/tokens';
 import { UserRole } from '../../types';
 import { Ionicons } from '@expo/vector-icons';
+import { LanguageToggle } from './LanguageToggle';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface RoleHeaderProps {
   currentRole: UserRole;
@@ -10,19 +12,28 @@ interface RoleHeaderProps {
 }
 
 export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRole }) => {
+  const { t, language } = useLanguage();
+
   return (
     <View style={styles.header}>
       <View style={styles.brandRow}>
-        <Ionicons name="heart-circle" size={28} color={COLORS.primaryGreen} />
-        <Text style={styles.brandTitle}>स्मृति सेतु | Smriti Setu</Text>
+        <View style={styles.logoMark}>
+          <Ionicons name="leaf" size={18} color={COLORS.primary} />
+        </View>
+        <Text style={styles.brandTitle}>
+          {language === 'as' ? t('appNameAs') : t('appName')}
+        </Text>
+        <View style={{ flex: 1 }} />
+        <LanguageToggle />
       </View>
+
       <View style={styles.switcherRow}>
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => onSwitchRole('patient')}
           style={[
             styles.roleChip,
-            currentRole === 'patient' ? styles.activeChipPatient : styles.inactiveChip,
+            currentRole === 'patient' ? styles.activeChip : styles.inactiveChip,
           ]}
         >
           <Text
@@ -31,7 +42,7 @@ export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRol
               currentRole === 'patient' ? styles.activeText : styles.inactiveText,
             ]}
           >
-            Patient Mode
+            {t('patientMode')}
           </Text>
         </TouchableOpacity>
 
@@ -40,7 +51,7 @@ export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRol
           onPress={() => onSwitchRole('caregiver')}
           style={[
             styles.roleChip,
-            currentRole === 'caregiver' ? styles.activeChipCaregiver : styles.inactiveChip,
+            currentRole === 'caregiver' ? styles.activeChip : styles.inactiveChip,
           ]}
         >
           <Text
@@ -49,7 +60,7 @@ export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRol
               currentRole === 'caregiver' ? styles.activeText : styles.inactiveText,
             ]}
           >
-            Caregiver Mode
+            {t('caregiverMode')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -59,23 +70,31 @@ export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRol
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     paddingTop: SPACING.md,
     paddingBottom: SPACING.sm,
     paddingHorizontal: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
+    gap: SPACING.sm,
   },
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: SPACING.xs,
-    gap: 8,
+    gap: 10,
+  },
+  logoMark: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: COLORS.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   brandTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '800',
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   switcherRow: {
     flexDirection: 'row',
@@ -83,30 +102,28 @@ const styles = StyleSheet.create({
   },
   roleChip: {
     flex: 1,
-    paddingVertical: 8,
-    borderRadius: ACCESSIBILITY.borderRadius.sm,
+    minHeight: 48,
+    paddingVertical: 10,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   inactiveChip: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surfaceMuted,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
-  activeChipPatient: {
-    backgroundColor: COLORS.primaryGreen,
-  },
-  activeChipCaregiver: {
-    backgroundColor: COLORS.skyBlue,
+  activeChip: {
+    backgroundColor: COLORS.primary,
   },
   chipText: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
   },
   activeText: {
-    color: COLORS.white,
+    color: COLORS.textOnPrimary,
   },
   inactiveText: {
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
   },
 });

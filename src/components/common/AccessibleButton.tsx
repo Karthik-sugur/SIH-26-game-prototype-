@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
 import { COLORS, ACCESSIBILITY, SPACING } from '../../theme/tokens';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -12,9 +12,6 @@ interface AccessibleButtonProps {
   style?: ViewStyle;
 }
 
-/**
- * Accessible button with non-negotiable >=56px touch target height and tap-only interaction for elderly patients.
- */
 export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
   title,
   onPress,
@@ -27,30 +24,30 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
     if (disabled) return COLORS.border;
     switch (variant) {
       case 'primary':
-        return COLORS.primaryGreen;
+        return COLORS.primary;
       case 'secondary':
-        return COLORS.skyBlue;
+        return COLORS.info;
       case 'accent':
-        return COLORS.warmOrange;
+        return COLORS.accent;
       case 'warning':
         return COLORS.warning;
       case 'outline':
         return 'transparent';
       default:
-        return COLORS.primaryGreen;
+        return COLORS.primary;
     }
   };
 
   const getTextColor = () => {
-    if (disabled) return COLORS.textMuted;
-    if (variant === 'outline') return COLORS.primaryGreen;
-    if (variant === 'accent' || variant === 'warning') return COLORS.textDark;
-    return COLORS.white;
+    if (disabled) return COLORS.textSecondary;
+    if (variant === 'outline') return COLORS.primary;
+    if (variant === 'accent' || variant === 'warning') return COLORS.white;
+    return COLORS.textOnPrimary;
   };
 
   return (
     <TouchableOpacity
-      activeOpacity={0.8}
+      activeOpacity={0.85}
       onPress={onPress}
       disabled={disabled}
       style={[
@@ -58,18 +55,13 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
         {
           backgroundColor: getBackgroundColor(),
           borderWidth: variant === 'outline' ? 2 : 0,
-          borderColor: COLORS.primaryGreen,
+          borderColor: COLORS.primary,
         },
         style,
       ]}
     >
       {iconName && (
-        <Ionicons
-          name={iconName}
-          size={24}
-          color={getTextColor()}
-          style={styles.icon}
-        />
+        <Ionicons name={iconName} size={24} color={getTextColor()} style={styles.icon} />
       )}
       <Text style={[styles.text, { color: getTextColor() }]}>{title}</Text>
     </TouchableOpacity>
@@ -78,19 +70,14 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    minHeight: ACCESSIBILITY.minTouchTargetHeight, // Minimum 56px height
+    minHeight: ACCESSIBILITY.minTouchTargetHeight,
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.sm,
-    borderRadius: ACCESSIBILITY.borderRadius.md,
+    borderRadius: ACCESSIBILITY.borderRadius.lg,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: SPACING.xs,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   icon: {
     marginRight: SPACING.sm,

@@ -21,7 +21,7 @@ export const Card: React.FC<CardProps> = ({
         styles.card,
         {
           backgroundColor: bgColor,
-          borderColor: borderColor,
+          borderColor,
         },
         style,
       ]}
@@ -37,10 +37,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: SPACING.md,
     marginVertical: SPACING.xs,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
+    shadowColor: '#1A2420',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
 });
