@@ -1,28 +1,40 @@
 export const COLORS = {
   // Primary Palette
-  primaryGreen: '#2E7D32',  // Main buttons, active elements, brand accent
-  skyBlue: '#4DA3D9',       // Links, selected states, illustrations
-  warmOrange: '#F2994A',     // Highlights, progress, positive feedback
-  softYellow: '#FDE68A',     // Background accents, gentle cues
-  lavender: '#A78BFA',       // Mood/memory, gentle prompts
+  primaryGreen: '#2E7D32',
+  primaryGreenLight: '#4CAF50',  // Lighter green for hover/active
+  skyBlue: '#4DA3D9',
+  skyBlueLight: '#E3F2FD',       // Light blue tint for backgrounds
+  warmOrange: '#F2994A',
+  softYellow: '#FDE68A',
+  lavender: '#A78BFA',
+  lavenderLight: '#F3F0FF',      // Lavender tint for backgrounds
 
   // Neutral Palette
-  bgLight: '#FAFAFC',        // Main app background
-  surface: '#F1F5F9',        // Card surfaces
-  border: '#CBD5E1',         // Borders
-  textDark: '#1F2937',       // High contrast text
-  textMuted: '#4B5563',      // Subtitle text
+  bgLight: '#F7F8FC',            // Slightly warmer background
+  surface: '#F1F5F9',
+  surfaceElevated: '#FFFFFF',    // Pure white for top-level cards
+  border: '#E2E8F0',             // Softer border
+  borderSubtle: '#F1F5F9',       // Ultra-subtle border
+  textDark: '#1A202C',           // Slightly richer dark
+  textMuted: '#64748B',          // Better muted
+  textSubtle: '#94A3B8',         // Even lighter for hints
   white: '#FFFFFF',
 
   // Feedback/Status Palette
   success: '#10B981',
+  successLight: '#D1FAE5',
   warning: '#F59E0B',
+  warningLight: '#FEF3C7',
   error: '#EF4444',
+  errorLight: '#FEE2E2',
   info: '#3B82F6',
+  infoLight: '#DBEAFE',
 
   // Accent Palette
   mintGreen: '#A7F3D0',
+  mintGreenDark: '#6EE7B7',
   peach: '#FFD8C2',
+  peachDark: '#FDBA74',
   teal: '#14B8A6',
   lightLilac: '#E9D5FF',
 };
@@ -37,23 +49,57 @@ export const SPACING = {
 };
 
 export const ACCESSIBILITY = {
-  minTouchTargetHeight: 56, // Non-negotiable 56px touch target for elderly patients
+  minTouchTargetHeight: 56,
   fontSize: {
     title: 28,
     heading: 22,
     body: 18,
     caption: 15,
+    micro: 12,
   },
   lineHeight: {
-    title: 36,
-    heading: 30,
-    body: 26,
+    title: 38,
+    heading: 32,
+    body: 28,
     caption: 22,
   },
   borderRadius: {
-    sm: 8,
-    md: 16,
-    lg: 24,
+    sm: 10,
+    md: 18,
+    lg: 26,
+    xl: 32,
     pill: 999,
   },
+};
+
+// Shared shadow tokens — soft, layered, no hard offsets
+export const SHADOWS = {
+  sm: {
+    shadowColor: '#94A3B8',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.10,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: '#64748B',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.10,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  lg: {
+    shadowColor: '#475569',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.10,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  colored: (hex: string) => ({
+    shadowColor: hex,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 4,
+  }),
 };

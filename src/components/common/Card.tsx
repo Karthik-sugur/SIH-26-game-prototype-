@@ -1,27 +1,33 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import { COLORS, ACCESSIBILITY, SPACING } from '../../theme/tokens';
+import { COLORS, ACCESSIBILITY, SPACING, SHADOWS } from '../../theme/tokens';
 
 interface CardProps {
   children: React.ReactNode;
   bgColor?: string;
   borderColor?: string;
   style?: ViewStyle;
+  elevated?: boolean;
+  noBorder?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
   children,
-  bgColor = COLORS.surface,
+  bgColor = COLORS.surfaceElevated,
   borderColor = COLORS.border,
   style,
+  elevated = false,
+  noBorder = false,
 }) => {
   return (
     <View
       style={[
         styles.card,
+        elevated ? styles.elevated : styles.flat,
         {
           backgroundColor: bgColor,
-          borderColor: borderColor,
+          borderColor: noBorder ? 'transparent' : borderColor,
+          borderWidth: noBorder ? 0 : 1,
         },
         style,
       ]}
@@ -34,13 +40,14 @@ export const Card: React.FC<CardProps> = ({
 const styles = StyleSheet.create({
   card: {
     borderRadius: ACCESSIBILITY.borderRadius.md,
-    borderWidth: 1,
     padding: SPACING.md,
     marginVertical: SPACING.xs,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
+    overflow: 'hidden',
+  },
+  flat: {
+    ...SHADOWS.sm,
+  },
+  elevated: {
+    ...SHADOWS.md,
   },
 });

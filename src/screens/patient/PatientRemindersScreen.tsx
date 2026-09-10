@@ -1,68 +1,99 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { COLORS, ACCESSIBILITY, SPACING } from '../../theme/tokens';
-import { Card } from '../../components/common/Card';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import { COLORS, ACCESSIBILITY, SPACING, SHADOWS } from '../../theme/tokens';
 import { AudioNarrationButton } from '../../components/common/AudioNarrationButton';
 import { useReminders } from '../../services/useReminders';
 import { Ionicons } from '@expo/vector-icons';
+import { CuedReminder } from '../../types';
+
+const CATEGORY_META: Record<string, { icon: keyof typeof Ionicons.glyphMap; color: string; bg: string }> = {
+  medicine:    { icon: 'medical',         color: COLORS.error,       bg: COLORS.errorLight },
+  hydration:   { icon: 'water',           color: COLORS.skyBlue,     bg: COLORS.skyBlueLight },
+  appointment: { icon: 'calendar',        color: COLORS.lavender,    bg: COLORS.lavenderLight },
+  activity:    { icon: 'walk',            color: COLORS.primaryGreen,bg: COLORS.mintGreen },
+};
+
+function ReminderRow({
+  item,
+  onToggle,
+}: {
+  item: CuedReminder;
+  onToggle: () => void;
+}) {
+  const meta = CATEGORY_META[item.category] ?? CATEGORY_META.activity;
+
+  return (
+    <View style={[styles.row, item.completedToday && styles.rowDone]}>
+      {/* Category icon */}
+      <View style={[styles.catIcon, { backgroundColor: meta.bg }]}>
+        <Ionicons name={meta.icon} size={20} color={meta.color} />
+      </View>
+
+      {/* Content */}
+      <View style={{ flex: 1 }}>
+        <View style={styles.rowHeaderLine}>
+          <Text style={styles.timeText}>{item.time}</Text>
+          <AudioNarrationButton textToNarrate={item.audioNarrationText} label="Listen" />
+        </View>
+        <Text style={[styles.questionText, item.completedToday && styles.questionDone]}>
+          "{item.questionPrompt}"
+        </Text>
+        <Text style={styles.subtitleText}>{item.subtitle}</Text>
+      </View>
+
+      {/* Check button */}
+      <TouchableOpacity
+        onPress={onToggle}
+        style={[styles.checkCircle, item.completedToday && styles.checkCircleDone]}
+        activeOpacity={0.7}
+      >
+        <Ionicons
+          name={item.completedToday ? 'checkmark' : 'ellipse-outline'}
+          size={22}
+          color={item.completedToday ? COLORS.white : COLORS.border}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+}
 
 export const PatientRemindersScreen: React.FC = () => {
   const { reminders, toggleReminderComplete } = useReminders();
+  const done = reminders.filter((r) => r.completedToday).length;
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      <Text style={styles.heading}>Today's Gentle Cues</Text>
-      <Text style={styles.subheading}>
-        Simple reminders presented as warm questions, not alarms.
-      </Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.heading}>Today's Gentle Cues</Text>
+        <View style={styles.progressPill}>
+          <Ionicons name="checkmark-circle" size={16} color={COLORS.primaryGreen} />
+          <Text style={styles.progressText}>{done} of {reminders.length} done</Text>
+        </View>
+      </View>
 
-      {reminders.map((item) => (
-        <Card
-          key={item.id}
-          bgColor={item.completedToday ? COLORS.mintGreen : COLORS.white}
-          borderColor={item.completedToday ? COLORS.primaryGreen : COLORS.border}
-          style={styles.reminderCard}
-        >
-          <View style={styles.timeCategoryRow}>
-            <View style={styles.timeBadge}>
-              <Ionicons name="time-outline" size={16} color={COLORS.textDark} />
-              <Text style={styles.timeText}>{item.time}</Text>
-            </View>
-            <AudioNarrationButton textToNarrate={item.audioNarrationText} label="Listen" />
-          </View>
+      {/* Progress bar */}
+      <View style={styles.progressBarTrack}>
+        <View
+          style={[
+            styles.progressBarFill,
+            { width: reminders.length ? `${(done / reminders.length) * 100}%` : '0%' },
+          ]}
+        />
+      </View>
 
-          <Text style={styles.questionText}>"{item.questionPrompt}"</Text>
-          <Text style={styles.subtitleText}>{item.subtitle}</Text>
+      <Text style={styles.subheading}>Warm reminders, not alarms.</Text>
 
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => toggleReminderComplete(item.id)}
-            style={[
-              styles.checkButton,
-              {
-                backgroundColor: item.completedToday
-                  ? COLORS.primaryGreen
-                  : COLORS.surface,
-                borderColor: item.completedToday ? COLORS.primaryGreen : COLORS.skyBlue,
-              },
-            ]}
-          >
-            <Ionicons
-              name={item.completedToday ? 'checkmark-circle' : 'ellipse-outline'}
-              size={28}
-              color={item.completedToday ? COLORS.white : COLORS.skyBlue}
-            />
-            <Text
-              style={[
-                styles.checkButtonText,
-                { color: item.completedToday ? COLORS.white : COLORS.textDark },
-              ]}
-            >
-              {item.completedToday ? 'Done Today ✓' : 'Tap to confirm answer'}
-            </Text>
-          </TouchableOpacity>
-        </Card>
-      ))}
+      {/* Reminder rows */}
+      <View style={styles.list}>
+        {reminders.map((item) => (
+          <ReminderRow
+            key={item.id}
+            item={item}
+            onToggle={() => toggleReminderComplete(item.id)}
+          />
+        ))}
+      </View>
     </ScrollView>
   );
 };
@@ -73,64 +104,120 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgLight,
     flexGrow: 1,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.xs,
+  },
   heading: {
-    fontSize: ACCESSIBILITY.fontSize.title,
+    fontSize: ACCESSIBILITY.fontSize.heading,
     fontWeight: '800',
     color: COLORS.textDark,
+    letterSpacing: -0.3,
+  },
+  progressPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: COLORS.mintGreen,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: ACCESSIBILITY.borderRadius.pill,
+  },
+  progressText: {
+    fontSize: ACCESSIBILITY.fontSize.micro,
+    fontWeight: '700',
+    color: COLORS.primaryGreen,
+  },
+  progressBarTrack: {
+    height: 5,
+    backgroundColor: COLORS.border,
+    borderRadius: 3,
+    marginBottom: SPACING.xs,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: COLORS.primaryGreen,
+    borderRadius: 3,
   },
   subheading: {
-    fontSize: ACCESSIBILITY.fontSize.body - 2,
+    fontSize: ACCESSIBILITY.fontSize.caption - 1,
     color: COLORS.textMuted,
     marginBottom: SPACING.md,
   },
-  reminderCard: {
-    padding: SPACING.lg,
-    marginBottom: SPACING.md,
+  list: {
+    gap: SPACING.sm,
   },
-  timeCategoryRow: {
+  row: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
+    padding: SPACING.md,
+    gap: SPACING.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.sm,
+  },
+  rowDone: {
+    backgroundColor: COLORS.successLight,
+    borderColor: COLORS.mintGreenDark,
+  },
+  catIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    marginTop: 2,
+  },
+  rowHeaderLine: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
-  },
-  timeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surface,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 4,
-    borderRadius: ACCESSIBILITY.borderRadius.sm,
-    gap: 4,
+    marginBottom: 4,
   },
   timeText: {
-    fontSize: ACCESSIBILITY.fontSize.caption,
+    fontSize: ACCESSIBILITY.fontSize.micro,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: COLORS.textSubtle,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   questionText: {
-    fontSize: ACCESSIBILITY.fontSize.heading - 2,
+    fontSize: ACCESSIBILITY.fontSize.body - 2,
     fontWeight: '700',
     color: COLORS.textDark,
-    marginVertical: SPACING.xs,
-    lineHeight: ACCESSIBILITY.lineHeight.heading - 2,
+    lineHeight: ACCESSIBILITY.lineHeight.caption,
+    marginBottom: 4,
+  },
+  questionDone: {
+    color: COLORS.textMuted,
+    textDecorationLine: 'line-through',
   },
   subtitleText: {
-    fontSize: ACCESSIBILITY.fontSize.body - 2,
+    fontSize: ACCESSIBILITY.fontSize.micro,
     color: COLORS.textMuted,
-    marginBottom: SPACING.md,
+    lineHeight: 17,
   },
-  checkButton: {
-    minHeight: ACCESSIBILITY.minTouchTargetHeight, // 56px minimum height
-    borderRadius: ACCESSIBILITY.borderRadius.md,
+  checkCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.surface,
     borderWidth: 2,
-    flexDirection: 'row',
+    borderColor: COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: SPACING.md,
-    gap: SPACING.xs,
+    flexShrink: 0,
+    alignSelf: 'center',
   },
-  checkButtonText: {
-    fontSize: ACCESSIBILITY.fontSize.body,
-    fontWeight: '700',
+  checkCircleDone: {
+    backgroundColor: COLORS.primaryGreen,
+    borderColor: COLORS.primaryGreen,
+    ...SHADOWS.colored(COLORS.primaryGreen),
   },
 });

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
-import { COLORS, ACCESSIBILITY } from '../../theme/tokens';
+import React, { useRef } from 'react';
+import { TouchableOpacity, Text, StyleSheet, Animated } from 'react-native';
+import { COLORS, ACCESSIBILITY, SHADOWS } from '../../theme/tokens';
 import { Ionicons } from '@expo/vector-icons';
 
 interface AudioNarrationButtonProps {
@@ -8,40 +8,56 @@ interface AudioNarrationButtonProps {
   label?: string;
 }
 
-/**
- * Placeholder audio-narration button component for elderly patient instructions.
- * Visually provides audio cues; simulates TTS narration playback on tap.
- */
 export const AudioNarrationButton: React.FC<AudioNarrationButtonProps> = ({
   textToNarrate = 'Audio narration cue',
   label = 'Listen',
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   const handlePress = () => {
     setIsPlaying(true);
-    setTimeout(() => {
-      setIsPlaying(false);
-    }, 2500);
+
+    Animated.sequence([
+      Animated.spring(scaleAnim, { toValue: 0.92, useNativeDriver: true, speed: 50, bounciness: 0 }),
+      Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, speed: 20, bounciness: 6 }),
+    ]).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1.08, duration: 500, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
+      ]),
+      { iterations: 3 }
+    ).start();
+
+    setTimeout(() => setIsPlaying(false), 2500);
   };
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={handlePress}
-      style={[
-        styles.container,
-        { backgroundColor: isPlaying ? COLORS.warmOrange : COLORS.lavender },
-      ]}
-      accessibilityLabel={`Audio Narration: ${label}`}
-    >
-      <Ionicons
-        name={isPlaying ? 'volume-high' : 'volume-medium-outline'}
-        size={24}
-        color={COLORS.textDark}
-      />
-      <Text style={styles.text}>{isPlaying ? 'Playing...' : label}</Text>
-    </TouchableOpacity>
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={handlePress}
+        style={[
+          styles.container,
+          isPlaying ? styles.playing : styles.idle,
+        ]}
+        accessibilityLabel={`Audio Narration: ${label}`}
+      >
+        <Animated.View style={{ transform: [{ scale: isPlaying ? pulseAnim : 1 }] }}>
+          <Ionicons
+            name={isPlaying ? 'volume-high' : 'volume-medium-outline'}
+            size={20}
+            color={isPlaying ? COLORS.white : COLORS.lavender}
+          />
+        </Animated.View>
+        <Text style={[styles.text, isPlaying && styles.textPlaying]}>
+          {isPlaying ? 'Playing…' : label}
+        </Text>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -50,15 +66,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: ACCESSIBILITY.borderRadius.pill,
-    minHeight: 48,
-    gap: 8,
+    minHeight: 40,
+    gap: 6,
+  },
+  idle: {
+    backgroundColor: COLORS.lavenderLight,
+    borderWidth: 1,
+    borderColor: COLORS.lavender,
+  },
+  playing: {
+    backgroundColor: COLORS.lavender,
+    borderWidth: 1,
+    borderColor: COLORS.lavender,
+    ...SHADOWS.colored(COLORS.lavender),
   },
   text: {
-    fontSize: ACCESSIBILITY.fontSize.caption,
+    fontSize: ACCESSIBILITY.fontSize.micro,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: COLORS.lavender,
+    letterSpacing: 0.3,
+  },
+  textPlaying: {
+    color: COLORS.white,
   },
 });

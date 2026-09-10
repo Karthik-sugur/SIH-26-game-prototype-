@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS, SPACING, ACCESSIBILITY } from '../../theme/tokens';
+import { COLORS, SPACING, ACCESSIBILITY, SHADOWS } from '../../theme/tokens';
 import { UserRole } from '../../types';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -13,43 +13,55 @@ export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRol
   return (
     <View style={styles.header}>
       <View style={styles.brandRow}>
-        <Ionicons name="heart-circle" size={28} color={COLORS.primaryGreen} />
-        <Text style={styles.brandTitle}>स्मृति सेतु | Smriti Setu</Text>
+        <View style={styles.logoMark}>
+          <Ionicons name="heart-circle" size={22} color={COLORS.white} />
+        </View>
+        <Text style={styles.brandTitle}>Smriti Setu</Text>
       </View>
       <View style={styles.switcherRow}>
         <TouchableOpacity
-          activeOpacity={0.7}
+          activeOpacity={0.8}
           onPress={() => onSwitchRole('patient')}
           style={[
             styles.roleChip,
             currentRole === 'patient' ? styles.activeChipPatient : styles.inactiveChip,
           ]}
         >
+          <Ionicons
+            name="person"
+            size={14}
+            color={currentRole === 'patient' ? COLORS.white : COLORS.textMuted}
+          />
           <Text
             style={[
               styles.chipText,
               currentRole === 'patient' ? styles.activeText : styles.inactiveText,
             ]}
           >
-            Patient Mode
+            Patient
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          activeOpacity={0.7}
+          activeOpacity={0.8}
           onPress={() => onSwitchRole('caregiver')}
           style={[
             styles.roleChip,
             currentRole === 'caregiver' ? styles.activeChipCaregiver : styles.inactiveChip,
           ]}
         >
+          <Ionicons
+            name="medical"
+            size={14}
+            color={currentRole === 'caregiver' ? COLORS.white : COLORS.textMuted}
+          />
           <Text
             style={[
               styles.chipText,
               currentRole === 'caregiver' ? styles.activeText : styles.inactiveText,
             ]}
           >
-            Caregiver Mode
+            Caregiver
           </Text>
         </TouchableOpacity>
       </View>
@@ -60,44 +72,62 @@ export const RoleHeader: React.FC<RoleHeaderProps> = ({ currentRole, onSwitchRol
 const styles = StyleSheet.create({
   header: {
     backgroundColor: COLORS.white,
-    paddingTop: SPACING.md,
+    paddingTop: SPACING.sm,
     paddingBottom: SPACING.sm,
     paddingHorizontal: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    ...SHADOWS.sm,
   },
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: SPACING.xs,
-    gap: 8,
-  },
-  brandTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: COLORS.textDark,
-  },
-  switcherRow: {
-    flexDirection: 'row',
     gap: SPACING.xs,
   },
-  roleChip: {
-    flex: 1,
-    paddingVertical: 8,
-    borderRadius: ACCESSIBILITY.borderRadius.sm,
+  logoMark: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: COLORS.primaryGreen,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  inactiveChip: {
+  brandTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: COLORS.textDark,
+    letterSpacing: -0.3,
+  },
+  switcherRow: {
+    flexDirection: 'row',
+    gap: 6,
     backgroundColor: COLORS.surface,
+    padding: 4,
+    borderRadius: ACCESSIBILITY.borderRadius.pill,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
+  roleChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: ACCESSIBILITY.borderRadius.pill,
+  },
+  inactiveChip: {
+    backgroundColor: 'transparent',
+  },
   activeChipPatient: {
     backgroundColor: COLORS.primaryGreen,
+    ...SHADOWS.colored(COLORS.primaryGreen),
   },
   activeChipCaregiver: {
     backgroundColor: COLORS.skyBlue,
+    ...SHADOWS.colored(COLORS.skyBlue),
   },
   chipText: {
     fontSize: 13,
