@@ -47,7 +47,12 @@ function DomainBar({ item }: { item: CognitiveDomainScore }) {
 
 const domainStyles = StyleSheet.create({
   row: { marginBottom: SPACING.md },
-  labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
   name: { fontSize: 15, fontWeight: '700', color: COLORS.textDark },
   trendChip: {
     flexDirection: 'row',
@@ -58,7 +63,13 @@ const domainStyles = StyleSheet.create({
     borderRadius: ACCESSIBILITY.borderRadius.pill,
   },
   trendText: { fontSize: 11, fontWeight: '700', textTransform: 'capitalize' },
-  barTrack: { height: 8, backgroundColor: COLORS.surface, borderRadius: 4, overflow: 'hidden', marginBottom: 4 },
+  barTrack: {
+    height: 8,
+    backgroundColor: COLORS.surface,
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 4,
+  },
   barFill: { height: '100%', borderRadius: 4 },
   scoreRow: { flexDirection: 'row', alignItems: 'baseline', gap: 3 },
   score: { fontSize: 16, fontWeight: '800' },
@@ -75,12 +86,8 @@ export const CaregiverDashboardScreen: React.FC<CaregiverDashboardScreenProps> =
   onNavigateDetail,
   onNavigateEscalation,
 }) => {
-<<<<<<< HEAD
-  const { weeklySummary, domainScores, alerts, trendLabel } = useCaregiverData();
-  const { lastInsight } = useKoriSession();
-=======
   const { weeklySummary, domainScores, alerts } = useCaregiverData();
->>>>>>> refs/remotes/sih-main
+  const { lastInsight } = useKoriSession();
   const { t } = useLanguage();
   const activeAlertCount = alerts.filter((a) => !a.resolved).length;
 
@@ -88,17 +95,16 @@ export const CaregiverDashboardScreen: React.FC<CaregiverDashboardScreenProps> =
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
       <View style={styles.topBar}>
         <View>
-          <Text style={styles.title}>{t ? t('caregiverDashboard') : 'Caregiver Dashboard'}</Text>
+          <Text style={styles.title}>{t('caregiverDashboard')}</Text>
           <Text style={styles.subtitle}>Ramesh Patel · 74 yrs</Text>
         </View>
         <TouchableOpacity onPress={onNavigateEscalation} style={styles.alertBadge}>
           <Ionicons name="notifications" size={18} color={COLORS.white} />
-          <Text style={styles.alertBadgeText}>{activeAlertCount} Alerts</Text>
+          <Text style={styles.alertBadgeText}>{t('alertsCount', { count: activeAlertCount })}</Text>
         </TouchableOpacity>
       </View>
 
-<<<<<<< HEAD
-      <Card bgColor={COLORS.primarySoft} borderColor={COLORS.border} style={styles.koriInsight}>
+      <View style={styles.koriInsight}>
         <Text style={styles.koriInsightTitle}>{t('koriInsightTitle')}</Text>
         {lastInsight ? (
           <>
@@ -122,13 +128,14 @@ export const CaregiverDashboardScreen: React.FC<CaregiverDashboardScreenProps> =
         ) : (
           <Text style={styles.koriEmpty}>{t('koriInsightEmpty')}</Text>
         )}
-      </Card>
+      </View>
 
-=======
-      {/* Flagged Concern Banner */}
->>>>>>> refs/remotes/sih-main
       {weeklySummary.flaggedConcern && (
-        <TouchableOpacity onPress={onNavigateEscalation} activeOpacity={0.85} style={styles.concernBanner}>
+        <TouchableOpacity
+          onPress={onNavigateEscalation}
+          activeOpacity={0.85}
+          style={styles.concernBanner}
+        >
           <View style={styles.concernIconWrap}>
             <Ionicons name="warning" size={20} color={COLORS.error} />
           </View>
@@ -140,23 +147,21 @@ export const CaregiverDashboardScreen: React.FC<CaregiverDashboardScreenProps> =
         </TouchableOpacity>
       )}
 
-      {/* Weekly summary */}
       <View style={styles.summaryCard}>
         <View style={styles.summaryHeaderRow}>
           <View style={styles.calIconWrap}>
             <Ionicons name="calendar-outline" size={18} color={COLORS.skyBlue} />
           </View>
-          <Text style={styles.summaryLabel}>What changed this week</Text>
+          <Text style={styles.summaryLabel}>{t('whatChanged')}</Text>
         </View>
         <Text style={styles.summaryHeadline}>{weeklySummary.headline}</Text>
         <Text style={styles.summaryDetail}>{weeklySummary.details}</Text>
       </View>
 
-      {/* Domain Trends */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Cognitive Domains</Text>
+        <Text style={styles.sectionTitle}>{t('domainTrends')}</Text>
         <TouchableOpacity onPress={onNavigateDetail}>
-          <Text style={styles.seeAll}>Full Analysis →</Text>
+          <Text style={styles.seeAll}>{t('viewFull')} →</Text>
         </TouchableOpacity>
       </View>
 
@@ -176,36 +181,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     gap: SPACING.md,
   },
-<<<<<<< HEAD
-  koriInsight: {
-    marginBottom: SPACING.md,
-    padding: SPACING.md,
-  },
-  koriInsightTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: COLORS.text,
-    marginBottom: SPACING.sm,
-  },
-  koriLine: {
-    fontSize: 15,
-    color: COLORS.text,
-    lineHeight: 22,
-    marginBottom: 4,
-  },
-  koriKey: {
-    fontWeight: '800',
-    color: COLORS.primary,
-  },
-  koriEmpty: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    lineHeight: 22,
-  },
-  header: {
-=======
   topBar: {
->>>>>>> refs/remotes/sih-main
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -235,6 +211,34 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
     color: COLORS.white,
+  },
+  koriInsight: {
+    backgroundColor: COLORS.primarySoft,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  koriInsightTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: COLORS.textDark,
+    marginBottom: SPACING.sm,
+  },
+  koriLine: {
+    fontSize: 15,
+    color: COLORS.textDark,
+    lineHeight: 22,
+    marginBottom: 4,
+  },
+  koriKey: {
+    fontWeight: '800',
+    color: COLORS.primaryGreen,
+  },
+  koriEmpty: {
+    fontSize: 15,
+    color: COLORS.textMuted,
+    lineHeight: 22,
   },
   concernBanner: {
     flexDirection: 'row',

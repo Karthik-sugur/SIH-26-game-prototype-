@@ -7,6 +7,7 @@ import { AudioNarrationButton } from '../../components/common/AudioNarrationButt
 import { usePatientData } from '../../services/usePatientData';
 import { useReminders } from '../../services/useReminders';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface PatientHomeScreenProps {
   onStartActivity: () => void;
@@ -19,46 +20,38 @@ export const PatientHomeScreen: React.FC<PatientHomeScreenProps> = ({
 }) => {
   const { patient } = usePatientData();
   const { reminders } = useReminders();
+  const { t } = useLanguage();
   const nextReminder = reminders.find((r) => !r.completedToday) || reminders[0];
   const completedCount = reminders.filter((r) => r.completedToday).length;
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      {/* Greeting */}
       <View style={styles.greetingRow}>
         <View style={styles.avatarCircle}>
           <Ionicons name="person" size={22} color={COLORS.primaryGreen} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.namasteText}>नमस्ते, {patient.name} ji 🙏</Text>
-          <Text style={styles.subGreeting}>Wishing you a calm and pleasant day.</Text>
+          <Text style={styles.namasteText}>{t('greeting', { name: patient.name })}</Text>
+          <Text style={styles.subGreeting}>{t('calmDay')}</Text>
         </View>
       </View>
 
-<<<<<<< HEAD
-      <Card bgColor={COLORS.primarySoft} borderColor={COLORS.border} style={styles.koriCard}>
+      <View style={styles.koriCard}>
         <Text style={styles.shells}>🐚 🐚 🐚</Text>
         <Text style={styles.koriTitle}>{t('koriGreeting')}</Text>
-        <Text style={styles.activityDescription}>{t('koriHomeDesc')}</Text>
+        <Text style={styles.koriDesc}>{t('koriHomeDesc')}</Text>
         <AccessibleButton
           title={t('koriHomeCta')}
           onPress={onStartActivity}
           variant="primary"
           iconName="play-circle"
         />
-      </Card>
+      </View>
 
-      <Card bgColor={COLORS.tileSand} borderColor={COLORS.border} style={styles.streakCard}>
-        <View style={styles.streakRow}>
-          <View style={styles.starCircle}>
-            <Ionicons name="sunny-outline" size={28} color={COLORS.accent} />
-=======
-      {/* Streak Card */}
-      <View style={[styles.streakCard]}>
+      <View style={styles.streakCard}>
         <View style={styles.streakLeft}>
           <View style={styles.streakIconWrap}>
             <Ionicons name="flame" size={24} color={COLORS.warmOrange} />
->>>>>>> refs/remotes/sih-main
           </View>
           <View>
             <Text style={styles.streakNumber}>{patient.streakDays}</Text>
@@ -74,46 +67,24 @@ export const PatientHomeScreen: React.FC<PatientHomeScreenProps> = ({
         </View>
       </View>
 
-      {/* Cued Memory Card */}
       <Card bgColor={COLORS.surfaceElevated} elevated style={styles.section}>
         <View style={styles.cardHeader}>
           <View style={styles.tagRow}>
             <View style={styles.tag}>
-              <Text style={styles.tagText}>TODAY'S CUE</Text>
+              <Text style={styles.tagText}>{t('todaysCue').toUpperCase()}</Text>
             </View>
           </View>
-          <AudioNarrationButton textToNarrate={nextReminder.audioNarrationText} label="Listen" />
+          <AudioNarrationButton textToNarrate={nextReminder.audioNarrationText} />
         </View>
         <Text style={styles.cueQuestion}>"{nextReminder.questionPrompt}"</Text>
         <Text style={styles.cueSubtitle}>{nextReminder.subtitle}</Text>
         <AccessibleButton
-          title="View Today's Cues"
+          title={t('checkCues')}
           onPress={onViewReminders}
           variant="outline"
           iconName="list"
         />
       </Card>
-<<<<<<< HEAD
-=======
-
-      {/* Activity Card */}
-      <View style={styles.activityCard}>
-        <View style={styles.activityIconWrap}>
-          <Ionicons name="game-controller" size={28} color={COLORS.white} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.activityTitle}>Today's Memory Activity</Text>
-          <Text style={styles.activityDesc}>Gentle 3-minute object recall to keep your memory sharp.</Text>
-        </View>
-        <AccessibleButton
-          title="Start Now"
-          onPress={onStartActivity}
-          variant="primary"
-          iconName="play-circle"
-          size="normal"
-        />
-      </View>
->>>>>>> refs/remotes/sih-main
     </ScrollView>
   );
 };
@@ -123,46 +94,6 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     backgroundColor: COLORS.bgLight,
     flexGrow: 1,
-<<<<<<< HEAD
-  },
-  greetingHeader: {
-    marginBottom: SPACING.md,
-  },
-  namasteText: {
-    fontSize: ACCESSIBILITY.fontSize.title,
-    fontWeight: '800',
-    color: COLORS.text,
-  },
-  subGreeting: {
-    fontSize: ACCESSIBILITY.fontSize.body,
-    color: COLORS.textSecondary,
-    marginTop: 4,
-    lineHeight: ACCESSIBILITY.lineHeight.body,
-  },
-  koriCard: {
-    padding: SPACING.lg,
-    marginBottom: SPACING.md,
-    alignItems: 'center',
-  },
-  shells: {
-    fontSize: 28,
-    marginBottom: SPACING.xs,
-  },
-  koriTitle: {
-    fontSize: ACCESSIBILITY.fontSize.heading,
-    fontWeight: '800',
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: SPACING.xs,
-  },
-  streakCard: {
-    marginBottom: SPACING.md,
-  },
-  streakRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-=======
->>>>>>> refs/remotes/sih-main
     gap: SPACING.md,
   },
   greetingRow: {
@@ -190,6 +121,33 @@ const styles = StyleSheet.create({
     fontSize: ACCESSIBILITY.fontSize.caption - 1,
     color: COLORS.textMuted,
     marginTop: 2,
+  },
+  koriCard: {
+    backgroundColor: COLORS.primarySoft,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
+    padding: SPACING.lg,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.sm,
+  },
+  shells: {
+    fontSize: 28,
+    marginBottom: SPACING.xs,
+  },
+  koriTitle: {
+    fontSize: ACCESSIBILITY.fontSize.heading,
+    fontWeight: '800',
+    color: COLORS.textDark,
+    textAlign: 'center',
+    marginBottom: SPACING.xs,
+  },
+  koriDesc: {
+    fontSize: ACCESSIBILITY.fontSize.body - 1,
+    color: COLORS.textMuted,
+    marginBottom: SPACING.md,
+    lineHeight: ACCESSIBILITY.lineHeight.body,
+    textAlign: 'center',
   },
   streakCard: {
     flexDirection: 'row',
@@ -275,24 +233,6 @@ const styles = StyleSheet.create({
   cueQuestion: {
     fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '700',
-<<<<<<< HEAD
-    color: COLORS.text,
-    marginVertical: SPACING.xs,
-    lineHeight: ACCESSIBILITY.lineHeight.heading,
-  },
-  cueSubtitle: {
-    fontSize: ACCESSIBILITY.fontSize.body - 1,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.md,
-    lineHeight: ACCESSIBILITY.lineHeight.body,
-  },
-  activityDescription: {
-    fontSize: ACCESSIBILITY.fontSize.body - 1,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.md,
-    lineHeight: ACCESSIBILITY.lineHeight.body,
-    textAlign: 'center',
-=======
     color: COLORS.textDark,
     lineHeight: ACCESSIBILITY.lineHeight.heading - 2,
     marginBottom: SPACING.xs,
@@ -302,35 +242,5 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     marginBottom: SPACING.md,
     lineHeight: 20,
-  },
-  activityCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.primaryGreen,
-    borderRadius: ACCESSIBILITY.borderRadius.md,
-    padding: SPACING.md,
-    gap: SPACING.sm,
-    ...SHADOWS.colored(COLORS.primaryGreen),
-  },
-  activityIconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  activityTitle: {
-    fontSize: ACCESSIBILITY.fontSize.heading - 4,
-    fontWeight: '800',
-    color: COLORS.white,
-    marginBottom: 2,
-  },
-  activityDesc: {
-    fontSize: ACCESSIBILITY.fontSize.micro,
-    color: 'rgba(255,255,255,0.8)',
-    lineHeight: 17,
->>>>>>> refs/remotes/sih-main
   },
 });
