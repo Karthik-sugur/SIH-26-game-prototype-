@@ -1,77 +1,67 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
-import { COLORS, SPACING, ACCESSIBILITY } from '../../theme/tokens';
-import { Card } from '../../components/common/Card';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { COLORS, SPACING, ACCESSIBILITY, SHADOWS } from '../../theme/tokens';
 import { AccessibleButton } from '../../components/common/AccessibleButton';
 import { useReminders } from '../../services/useReminders';
 import { Ionicons } from '@expo/vector-icons';
-import { useLanguage } from '../../i18n/LanguageContext';
 
 export const CaregiverRemindersScreen: React.FC = () => {
-  const { reminders, addReminder, categoryLabel } = useReminders();
-  const { t } = useLanguage();
+  const { reminders, addReminder } = useReminders();
   const [showAddForm, setShowAddForm] = useState(false);
   const [time, setTime] = useState('02:00 PM');
-  const [question, setQuestion] = useState('');
-  const [subtitle, setSubtitle] = useState('');
-  const questionValue = question || t('defaultNewQuestion');
-  const subtitleValue = subtitle || t('defaultNewSubtitle');
+  const [question, setQuestion] = useState('Have you taken your afternoon herbal tea?');
+  const [subtitle, setSubtitle] = useState('Warm drink cue');
 
   const handleCreate = () => {
     addReminder({
       time,
       category: 'hydration',
-      questionPrompt: questionValue,
-      subtitle: subtitleValue,
-      audioNarrationText: questionValue,
+      questionPrompt: question,
+      subtitle,
+      audioNarrationText: question,
     });
     setShowAddForm(false);
-    setQuestion('');
-    setSubtitle('');
   };
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title}>{t('remindersMgmt')}</Text>
-          <Text style={styles.subtitle}>{t('configureFor', { name: 'Ramesh' })}</Text>
+          <Text style={styles.title}>Reminders Management</Text>
+          <Text style={styles.subtitle}>Configure cued-recall prompts for Ramesh</Text>
         </View>
-        <AccessibleButton
-          title={showAddForm ? t('close') : t('addPrompt')}
+        <TouchableOpacity
+          activeOpacity={0.8}
           onPress={() => setShowAddForm(!showAddForm)}
-          variant="secondary"
-          style={{ minHeight: 48, paddingHorizontal: 12 }}
-        />
+          style={styles.toggleFormButton}
+        >
+          <Ionicons name={showAddForm ? 'close' : 'add'} size={20} color={COLORS.white} />
+          <Text style={styles.toggleFormText}>{showAddForm ? 'Close' : 'New Cue'}</Text>
+        </TouchableOpacity>
       </View>
 
+      {/* Add Reminder Form */}
       {showAddForm && (
-        <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.formCard}>
-          <Text style={styles.formTitle}>{t('newPrompt')}</Text>
+        <View style={styles.formCard}>
+          <Text style={styles.formTitle}>New Cued Reminder Prompt</Text>
 
-          <Text style={styles.label}>{t('scheduledTime')}</Text>
-          <TextInput style={styles.input} value={time} onChangeText={setTime} />
+          <Text style={styles.label}>Scheduled Time</Text>
+          <TextInput style={styles.input} value={time} onChangeText={setTime} placeholderTextColor={COLORS.textSubtle} />
 
-          <Text style={styles.label}>{t('questionPrompt')}</Text>
+          <Text style={styles.label}>Question Prompt (Gentle Cued Recall)</Text>
           <TextInput
             style={[styles.input, { minHeight: 60 }]}
             value={question}
-            placeholder={t('defaultNewQuestion')}
             onChangeText={setQuestion}
             multiline
             placeholderTextColor={COLORS.textSubtle}
           />
 
-          <Text style={styles.label}>{t('subtitleContext')}</Text>
-          <TextInput
-            style={styles.input}
-            value={subtitle}
-            placeholder={t('defaultNewSubtitle')}
-            onChangeText={setSubtitle}
-          />
+          <Text style={styles.label}>Subtitle / Context</Text>
+          <TextInput style={styles.input} value={subtitle} onChangeText={setSubtitle} placeholderTextColor={COLORS.textSubtle} />
 
           <AccessibleButton
-            title={t('saveReminder')}
+            title="Save Cued Reminder"
             onPress={handleCreate}
             variant="primary"
             iconName="save-outline"
@@ -79,17 +69,21 @@ export const CaregiverRemindersScreen: React.FC = () => {
         </View>
       )}
 
-      <Text style={styles.sectionTitle}>{t('activeSchedule')}</Text>
+      {/* Schedule List */}
+      <Text style={styles.sectionTitle}>Active Daily Schedule</Text>
 
-      {reminders.map((item) => (
-        <Card key={item.id} bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.itemCard}>
-          <View style={styles.itemHeader}>
-            <View style={styles.timeTag}>
-              <Ionicons name="time" size={16} color={COLORS.info} />
-              <Text style={styles.timeText}>{item.time}</Text>
+      <View style={styles.scheduleList}>
+        {reminders.map((item) => (
+          <View key={item.id} style={styles.itemCard}>
+            <View style={styles.itemHeader}>
+              <View style={styles.timeTag}>
+                <Ionicons name="time-outline" size={16} color={COLORS.skyBlue} />
+                <Text style={styles.timeText}>{item.time}</Text>
+              </View>
+              <View style={styles.categoryBadge}>
+                <Text style={styles.categoryText}>{item.category}</Text>
+              </View>
             </View>
-            <Text style={styles.categoryText}>{categoryLabel(item.category)}</Text>
-          </View>
 
             <Text style={styles.promptText}>"{item.questionPrompt}"</Text>
             <Text style={styles.subText}>{item.subtitle}</Text>
@@ -103,7 +97,7 @@ export const CaregiverRemindersScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.md,
-    backgroundColor: COLORS.bg,
+    backgroundColor: COLORS.bgLight,
     flexGrow: 1,
     gap: SPACING.md,
   },
@@ -111,17 +105,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: SPACING.md,
-    gap: SPACING.sm,
   },
   title: {
     fontSize: ACCESSIBILITY.fontSize.heading - 2,
     fontWeight: '800',
-    color: COLORS.text,
+    color: COLORS.textDark,
+    letterSpacing: -0.3,
   },
   subtitle: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
+    fontSize: ACCESSIBILITY.fontSize.caption - 1,
+    color: COLORS.textMuted,
   },
   toggleFormButton: {
     flexDirection: 'row',
@@ -150,31 +143,34 @@ const styles = StyleSheet.create({
   formTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: COLORS.text,
+    color: COLORS.textDark,
     marginBottom: SPACING.xs,
   },
   label: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '700',
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
+    color: COLORS.textSubtle,
+    marginTop: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   input: {
-    backgroundColor: COLORS.surfaceMuted,
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: ACCESSIBILITY.borderRadius.sm,
     padding: SPACING.sm,
-    fontSize: 16,
-    color: COLORS.text,
-    marginTop: 4,
-    minHeight: 48,
+    fontSize: 14,
+    color: COLORS.textDark,
+    marginTop: 2,
   },
   sectionTitle: {
     fontSize: ACCESSIBILITY.fontSize.heading - 4,
     fontWeight: '800',
-    color: COLORS.text,
-    marginBottom: SPACING.xs,
+    color: COLORS.textDark,
+  },
+  scheduleList: {
+    gap: SPACING.sm,
   },
   itemCard: {
     backgroundColor: COLORS.surfaceElevated,
@@ -196,9 +192,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   timeText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
-    color: COLORS.info,
+    color: COLORS.skyBlue,
   },
   categoryBadge: {
     backgroundColor: COLORS.surface,
@@ -207,19 +203,19 @@ const styles = StyleSheet.create({
     borderRadius: ACCESSIBILITY.borderRadius.pill,
   },
   categoryText: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '700',
-    color: COLORS.textSecondary,
+    color: COLORS.textMuted,
     textTransform: 'uppercase',
   },
   promptText: {
     fontSize: 15,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.textDark,
   },
   subText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
+    fontSize: 13,
+    color: COLORS.textMuted,
     marginTop: 2,
   },
 });

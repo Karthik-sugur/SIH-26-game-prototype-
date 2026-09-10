@@ -12,21 +12,26 @@ export const COLORS = {
   // Surfaces
   bg: '#F5F4F0',            // Warm light ground
   surface: '#FFFFFF',
+  surfaceElevated: '#FFFFFF',
   surfaceMuted: '#EEF1EF',
   border: '#D5DCD7',
 
   // Text
   text: '#1A2420',          // Near-black green for contrast
   textSecondary: '#4A5A52',
+  textSubtle: '#4A5A52',
   textOnPrimary: '#FFFFFF',
 
   // Status (muted, readable)
   success: '#2F6B4F',
   successBg: '#E4F0EA',
+  successLight: '#E4F0EA',
   warning: '#9A6B2F',
   warningBg: '#F5EBD8',
+  warningLight: '#F5EBD8',
   error: '#A33D3D',
   errorBg: '#F8E8E8',
+  errorLight: '#F8E8E8',
   info: '#3A6A8A',
   infoBg: '#E6EEF4',
 
@@ -36,18 +41,23 @@ export const COLORS = {
   tileSky: '#E2EAF0',
   tileSand: '#F0E9DF',
 
-  // Legacy aliases (keep screens compiling during migration)
+  // Legacy & helper aliases (keep all screens compiling smoothly)
   primaryGreen: '#3D6B5A',
+  primaryGreenLight: '#4CAF50',
   skyBlue: '#3A6A8A',
+  skyBlueLight: '#E6EEF4',
   warmOrange: '#C4784A',
   softYellow: '#F0E9DF',
   lavender: '#C9B8D4',
+  lavenderLight: '#EDE6F2',
   bgLight: '#F5F4F0',
   textDark: '#1A2420',
   textMuted: '#4A5A52',
   white: '#FFFFFF',
   mintGreen: '#E4F0EA',
+  mintGreenDark: '#2F6B4F',
   peach: '#F8EDE4',
+  peachDark: '#C4784A',
   teal: '#3D6B5A',
   lightLilac: '#EDE6F2',
 };
@@ -68,17 +78,20 @@ export const ACCESSIBILITY = {
     heading: 22,
     body: 18,
     caption: 16,
+    micro: 13,
   },
   lineHeight: {
     title: 38,
     heading: 30,
     body: 28,
     caption: 24,
+    micro: 18,
   },
   borderRadius: {
     sm: 12,
     md: 20,
     lg: 28,
+    xl: 32,
     pill: 999,
   },
 };

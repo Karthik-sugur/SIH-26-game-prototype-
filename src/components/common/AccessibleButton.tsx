@@ -1,6 +1,6 @@
-import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
-import { COLORS, ACCESSIBILITY, SPACING } from '../../theme/tokens';
+import React, { useRef } from 'react';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle, Animated } from 'react-native';
+import { COLORS, ACCESSIBILITY, SPACING, SHADOWS } from '../../theme/tokens';
 import { Ionicons } from '@expo/vector-icons';
 
 interface AccessibleButtonProps {
@@ -22,55 +22,97 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
   style,
   size = 'normal',
 }) => {
-  const getBackgroundColor = () => {
-    if (disabled) return COLORS.border;
-    switch (variant) {
-      case 'primary':
-        return COLORS.primary;
-      case 'secondary':
-        return COLORS.info;
-      case 'accent':
-        return COLORS.accent;
-      case 'warning':
-        return COLORS.warning;
-      case 'outline':
-        return 'transparent';
-      default:
-        return COLORS.primary;
-    }
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.96,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 0,
+    }).start();
   };
 
-  const getTextColor = () => {
-    if (disabled) return COLORS.textSecondary;
-    if (variant === 'outline') return COLORS.primary;
-    if (variant === 'accent' || variant === 'warning') return COLORS.white;
-    return COLORS.textOnPrimary;
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 30,
+      bounciness: 4,
+    }).start();
+  };
+
+  const configMap: Record<string, { bg: string; text: string; shadow: object; border?: string }> = {
+    primary: {
+      bg: COLORS.primary,
+      text: COLORS.white,
+      shadow: SHADOWS.colored(COLORS.primary),
+    },
+    secondary: {
+      bg: COLORS.skyBlue,
+      text: COLORS.white,
+      shadow: SHADOWS.colored(COLORS.skyBlue),
+    },
+    accent: {
+      bg: COLORS.warmOrange,
+      text: COLORS.white,
+      shadow: SHADOWS.colored(COLORS.warmOrange),
+    },
+    warning: {
+      bg: COLORS.warning,
+      text: COLORS.white,
+      shadow: SHADOWS.colored(COLORS.warning),
+    },
+    outline: {
+      bg: 'transparent',
+      text: COLORS.primary,
+      shadow: {},
+      border: COLORS.primary,
+    },
+    ghost: {
+      bg: COLORS.surface,
+      text: COLORS.text,
+      shadow: {},
+    },
   };
 
   const cfg = disabled
     ? { bg: COLORS.border, text: COLORS.textMuted, shadow: {} }
-    : config[variant];
+    : configMap[variant] || configMap.primary;
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.85}
-      onPress={onPress}
-      disabled={disabled}
-      style={[
-        styles.button,
-        {
-          backgroundColor: getBackgroundColor(),
-          borderWidth: variant === 'outline' ? 2 : 0,
-          borderColor: COLORS.primary,
-        },
-        style,
-      ]}
-    >
-      {iconName && (
-        <Ionicons name={iconName} size={24} color={getTextColor()} style={styles.icon} />
-      )}
-      <Text style={[styles.text, { color: getTextColor() }]}>{title}</Text>
-    </TouchableOpacity>
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={disabled}
+        style={[
+          styles.button,
+          size === 'large' && styles.buttonLarge,
+          {
+            backgroundColor: cfg.bg,
+            borderWidth: variant === 'outline' ? 2 : 0,
+            borderColor: cfg.border ?? 'transparent',
+            ...cfg.shadow,
+          },
+          style,
+        ]}
+      >
+        {iconName && (
+          <Ionicons
+            name={iconName}
+            size={size === 'large' ? 26 : 22}
+            color={cfg.text}
+            style={styles.icon}
+          />
+        )}
+        <Text style={[styles.text, size === 'large' && styles.textLarge, { color: cfg.text }]}>
+          {title}
+        </Text>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -79,11 +121,16 @@ const styles = StyleSheet.create({
     minHeight: ACCESSIBILITY.minTouchTargetHeight,
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.sm,
-    borderRadius: ACCESSIBILITY.borderRadius.lg,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: SPACING.xs,
+  },
+  buttonLarge: {
+    minHeight: 64,
+    paddingHorizontal: SPACING.xl,
+    borderRadius: ACCESSIBILITY.borderRadius.lg,
   },
   icon: {
     marginRight: 10,

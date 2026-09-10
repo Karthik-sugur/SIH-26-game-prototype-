@@ -7,17 +7,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 const TREND_CFG = {
-  improving: { icon: 'trending-up' as const,    color: COLORS.primaryGreen, bg: COLORS.successLight },
-  stable:    { icon: 'remove-outline' as const,  color: COLORS.warning,      bg: COLORS.warningLight },
-  declining: { icon: 'trending-down' as const,   color: COLORS.error,        bg: COLORS.errorLight },
+  improving: { icon: 'trending-up' as const, color: COLORS.primaryGreen, bg: COLORS.successLight },
+  stable: { icon: 'remove-outline' as const, color: COLORS.warning, bg: COLORS.warningLight },
+  declining: { icon: 'trending-down' as const, color: COLORS.error, bg: COLORS.errorLight },
 };
 
 const DOMAIN_COLOR: Record<string, string> = {
-  'Memory':             COLORS.primaryGreen,
-  'Attention':          COLORS.skyBlue,
+  Memory: COLORS.primaryGreen,
+  Attention: COLORS.skyBlue,
   'Executive Function': COLORS.lavender,
-  'Language':           COLORS.warmOrange,
-  'Visuospatial':       COLORS.teal,
+  Language: COLORS.warmOrange,
+  Visuospatial: COLORS.teal,
 };
 
 function DomainBar({ item }: { item: CognitiveDomainScore }) {
@@ -49,8 +49,12 @@ const domainStyles = StyleSheet.create({
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
   name: { fontSize: 15, fontWeight: '700', color: COLORS.textDark },
   trendChip: {
-    flexDirection: 'row', alignItems: 'center', gap: 3,
-    paddingHorizontal: 8, paddingVertical: 3, borderRadius: ACCESSIBILITY.borderRadius.pill,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: ACCESSIBILITY.borderRadius.pill,
   },
   trendText: { fontSize: 11, fontWeight: '700', textTransform: 'capitalize' },
   barTrack: { height: 8, backgroundColor: COLORS.surface, borderRadius: 4, overflow: 'hidden', marginBottom: 4 },
@@ -61,94 +65,69 @@ const domainStyles = StyleSheet.create({
   changeDesc: { fontSize: 11, color: COLORS.textSubtle, flex: 1, textAlign: 'right' },
 });
 
-interface Props {
+interface CaregiverDashboardScreenProps {
   onNavigateDetail: () => void;
   onNavigateEscalation: () => void;
 }
-
-const TILE_COLORS = [COLORS.tileJade, COLORS.tileRose, COLORS.tileSky, COLORS.tileSand, COLORS.primarySoft];
 
 export const CaregiverDashboardScreen: React.FC<CaregiverDashboardScreenProps> = ({
   onNavigateDetail,
   onNavigateEscalation,
 }) => {
-  const { weeklySummary, domainScores, alerts, trendLabel } = useCaregiverData();
+  const { weeklySummary, domainScores, alerts } = useCaregiverData();
   const { t } = useLanguage();
   const activeAlertCount = alerts.filter((a) => !a.resolved).length;
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.title}>{t('caregiverDashboard')}</Text>
-          <Text style={styles.subtitle}>
-            {t('patientLabel', { name: 'Ramesh Patel', age: 74 })}
-          </Text>
+      <View style={styles.topBar}>
+        <View>
+          <Text style={styles.title}>{t ? t('caregiverDashboard') : 'Caregiver Dashboard'}</Text>
+          <Text style={styles.subtitle}>Ramesh Patel · 74 yrs</Text>
         </View>
-        <TouchableOpacity style={styles.alertCountChip} onPress={onNavigateEscalation}>
-          <Ionicons name="notifications" size={20} color={COLORS.white} />
-          <Text style={styles.alertCountText}>{t('alertsCount', { count: activeAlertCount })}</Text>
+        <TouchableOpacity onPress={onNavigateEscalation} style={styles.alertBadge}>
+          <Ionicons name="notifications" size={18} color={COLORS.white} />
+          <Text style={styles.alertBadgeText}>{activeAlertCount} Alerts</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Flagged Concern Banner */}
       {weeklySummary.flaggedConcern && (
-        <Card bgColor={COLORS.errorBg} borderColor={COLORS.error} style={styles.bannerCard}>
-          <View style={styles.bannerHeader}>
-            <Ionicons name="warning" size={24} color={COLORS.error} />
-            <Text style={styles.bannerTitle}>
-              {t('flaggedConcern', { title: weeklySummary.flaggedConcern.title })}
-            </Text>
+        <TouchableOpacity onPress={onNavigateEscalation} activeOpacity={0.85} style={styles.concernBanner}>
+          <View style={styles.concernIconWrap}>
+            <Ionicons name="warning" size={20} color={COLORS.error} />
           </View>
-          <Text style={styles.bannerText}>{weeklySummary.flaggedConcern.recommendation}</Text>
-          <TouchableOpacity onPress={onNavigateEscalation} style={styles.bannerLink}>
-            <Text style={styles.bannerLinkText}>{t('viewEscalation')} →</Text>
-          </TouchableOpacity>
-        </Card>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.concernTitle}>{weeklySummary.flaggedConcern.title}</Text>
+            <Text style={styles.concernText}>{weeklySummary.flaggedConcern.recommendation}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={COLORS.error} />
+        </TouchableOpacity>
       )}
 
-      <Card bgColor={COLORS.surface} borderColor={COLORS.border} style={styles.summaryCard}>
-        <View style={styles.summaryHeader}>
-          <Ionicons name="calendar-outline" size={22} color={COLORS.info} />
-          <Text style={styles.summaryTitle}>{t('whatChanged')}</Text>
+      {/* Weekly summary */}
+      <View style={styles.summaryCard}>
+        <View style={styles.summaryHeaderRow}>
+          <View style={styles.calIconWrap}>
+            <Ionicons name="calendar-outline" size={18} color={COLORS.skyBlue} />
+          </View>
+          <Text style={styles.summaryLabel}>What changed this week</Text>
         </View>
         <Text style={styles.summaryHeadline}>{weeklySummary.headline}</Text>
         <Text style={styles.summaryDetail}>{weeklySummary.details}</Text>
       </View>
 
+      {/* Domain Trends */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{t('domainTrends')}</Text>
+        <Text style={styles.sectionTitle}>Cognitive Domains</Text>
         <TouchableOpacity onPress={onNavigateDetail}>
-          <Text style={styles.seeAllText}>{t('viewFull')} →</Text>
+          <Text style={styles.seeAll}>Full Analysis →</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.domainsGrid}>
-        {domainScores.map((item, index) => (
-          <Card
-            key={item.domain}
-            bgColor={TILE_COLORS[index % TILE_COLORS.length]}
-            borderColor={COLORS.border}
-            style={styles.domainCard}
-          >
-            <View style={styles.domainCardHeader}>
-              <Text style={styles.domainName}>{item.domain}</Text>
-              <Badge
-                label={trendLabel(item.trend)}
-                type={
-                  item.trend === 'improving'
-                    ? 'success'
-                    : item.trend === 'declining'
-                    ? 'warning'
-                    : 'stable'
-                }
-              />
-            </View>
-            <View style={styles.scoreRow}>
-              <Text style={styles.scoreNumber}>{item.score}</Text>
-              <Text style={styles.scoreMax}>{t('scoreOf')}</Text>
-            </View>
-            <Text style={styles.changeDesc}>{item.changeDescription}</Text>
-          </Card>
+      <View style={styles.domainsCard}>
+        {domainScores.map((item) => (
+          <DomainBar key={item.domain} item={item} />
         ))}
       </View>
     </ScrollView>
@@ -158,7 +137,7 @@ export const CaregiverDashboardScreen: React.FC<CaregiverDashboardScreenProps> =
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.md,
-    backgroundColor: COLORS.bg,
+    backgroundColor: COLORS.bgLight,
     flexGrow: 1,
     gap: SPACING.md,
   },
@@ -166,17 +145,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.md,
-    gap: SPACING.sm,
   },
   title: {
     fontSize: ACCESSIBILITY.fontSize.heading,
     fontWeight: '800',
-    color: COLORS.text,
+    color: COLORS.textDark,
+    letterSpacing: -0.3,
   },
   subtitle: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
+    fontSize: ACCESSIBILITY.fontSize.caption - 1,
+    color: COLORS.textMuted,
     marginTop: 2,
   },
   alertBadge: {
@@ -184,33 +162,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 5,
     backgroundColor: COLORS.error,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
     borderRadius: ACCESSIBILITY.borderRadius.pill,
-    gap: 6,
-    minHeight: 44,
+    ...SHADOWS.colored(COLORS.error),
   },
-  alertCountText: {
-    fontSize: 14,
-    fontWeight: '700',
+  alertBadgeText: {
+    fontSize: 13,
+    fontWeight: '800',
     color: COLORS.white,
   },
   concernBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SPACING.xs,
-    marginBottom: 6,
-  },
-  bannerTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: COLORS.error,
-    flex: 1,
-  },
-  bannerText: {
-    fontSize: 15,
-    color: COLORS.text,
-    lineHeight: 22,
+    gap: SPACING.sm,
+    backgroundColor: COLORS.errorLight,
+    borderRadius: ACCESSIBILITY.borderRadius.md,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.error + '33',
   },
   concernIconWrap: {
     width: 40,
@@ -221,9 +191,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexShrink: 0,
   },
-  bannerLinkText: {
-    fontSize: 15,
-    fontWeight: '700',
+  concernTitle: {
+    fontSize: 14,
+    fontWeight: '800',
     color: COLORS.error,
     marginBottom: 2,
   },
@@ -246,72 +216,53 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
   },
-  summaryTitle: {
-    fontSize: 15,
+  calIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: COLORS.skyBlueLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  summaryLabel: {
+    fontSize: ACCESSIBILITY.fontSize.micro,
     fontWeight: '700',
-    color: COLORS.info,
+    color: COLORS.skyBlue,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   summaryHeadline: {
     fontSize: ACCESSIBILITY.fontSize.heading - 4,
     fontWeight: '800',
-    color: COLORS.text,
-    marginVertical: 4,
+    color: COLORS.textDark,
+    letterSpacing: -0.2,
   },
-  detailsText: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    lineHeight: 22,
+  summaryDetail: {
+    fontSize: 13,
+    color: COLORS.textMuted,
+    lineHeight: 19,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.xs,
-    gap: SPACING.sm,
   },
   sectionTitle: {
     fontSize: ACCESSIBILITY.fontSize.heading - 4,
     fontWeight: '800',
-    color: COLORS.text,
-    flex: 1,
+    color: COLORS.textDark,
   },
   seeAll: {
     fontSize: 13,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.primaryGreen,
   },
   domainsCard: {
     backgroundColor: COLORS.surfaceElevated,
     borderRadius: ACCESSIBILITY.borderRadius.md,
     padding: SPACING.md,
-  },
-  domainCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  domainName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.text,
-  },
-  scoreRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    marginVertical: 4,
-  },
-  scoreNumber: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: COLORS.text,
-  },
-  scoreMax: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginLeft: 2,
-  },
-  changeDesc: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.sm,
   },
 });
